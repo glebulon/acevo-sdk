@@ -6,10 +6,11 @@ shared-memory decoding, telemetry analysis, and API submission code.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, Set
 import threading
 import uuid
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
 
 from .models import LapData, SessionData
 
@@ -20,11 +21,11 @@ class LapValidityData:
 
     lap_number: int
     is_valid: bool
-    invalidation_reason: Optional[str] = None
-    invalidation_timestamp: Optional[str] = None
+    invalidation_reason: str | None = None
+    invalidation_timestamp: str | None = None
     source: str = "shm_graphics"
-    penalty_count: Optional[int] = None
-    track_limit_violations: Optional[int] = None
+    penalty_count: int | None = None
+    track_limit_violations: int | None = None
 
 
 @dataclass
@@ -32,24 +33,24 @@ class LapTimingData:
     """Lap timing information with source tracking."""
 
     lap_number: int
-    current_lap_time_ms: Optional[int] = None
-    last_lap_time_ms: Optional[int] = None
-    best_lap_time_ms: Optional[int] = None
-    ideal_lap_time_ms: Optional[int] = None
-    delta_time_ms: Optional[int] = None
+    current_lap_time_ms: int | None = None
+    last_lap_time_ms: int | None = None
+    best_lap_time_ms: int | None = None
+    ideal_lap_time_ms: int | None = None
+    delta_time_ms: int | None = None
     source: str = "shm_graphics"
-    lap_time_str: Optional[str] = None
-    lap_completion_timestamp: Optional[str] = None
+    lap_time_str: str | None = None
+    lap_completion_timestamp: str | None = None
 
 
 @dataclass
 class FuelData:
     """Fuel information with source tracking."""
 
-    current_fuel: Optional[float] = None
-    fuel_consumption_rate: Optional[float] = None
-    fuel_economy: Optional[float] = None
-    fuel_consumed_lap: Optional[float] = None
+    current_fuel: float | None = None
+    fuel_consumption_rate: float | None = None
+    fuel_economy: float | None = None
+    fuel_consumed_lap: float | None = None
     source: str = "shm_graphics"
 
 
@@ -57,10 +58,10 @@ class FuelData:
 class PlayerIdentificationData:
     """Player identification from logs (SHM does not provide this)."""
 
-    steam_id: Optional[str] = None
-    player_name: Optional[str] = None
-    car_uuid: Optional[str] = None
-    car_model: Optional[str] = None
+    steam_id: str | None = None
+    player_name: str | None = None
+    car_uuid: str | None = None
+    car_model: str | None = None
     source: str = "logs"
 
 
@@ -69,9 +70,9 @@ class SectorSplitData:
     """Sector split times from logs (SHM does not provide this)."""
 
     lap_number: int
-    sector1_ms: Optional[int] = None
-    sector2_ms: Optional[int] = None
-    sector3_ms: Optional[int] = None
+    sector1_ms: int | None = None
+    sector2_ms: int | None = None
+    sector3_ms: int | None = None
     source: str = "logs"
 
 
@@ -85,11 +86,11 @@ class SessionMetadataData:
     session_name: str = "Unknown"
     track: str = "Unknown"
     track_configuration: str = "Unknown"
-    track_length_m: Optional[float] = None
+    track_length_m: float | None = None
     weather: str = "Unknown"
     is_online: bool = False
     is_timed_race: bool = False
-    event_id: Optional[int] = None
+    event_id: int | None = None
     source: str = "shm_static"
 
 
@@ -98,13 +99,13 @@ class SharedSessionData:
     """Unified session data accessible by telemetry and log parser."""
 
     # Shared objects
-    lap_validity: Dict[int, LapValidityData] = field(default_factory=dict)
-    lap_timing: Dict[int, LapTimingData] = field(default_factory=dict)
+    lap_validity: dict[int, LapValidityData] = field(default_factory=dict)
+    lap_timing: dict[int, LapTimingData] = field(default_factory=dict)
     fuel_data: FuelData = field(default_factory=FuelData)
     player_identification: PlayerIdentificationData = field(
         default_factory=PlayerIdentificationData
     )
-    sector_splits: Dict[int, SectorSplitData] = field(default_factory=dict)
+    sector_splits: dict[int, SectorSplitData] = field(default_factory=dict)
     session_metadata: SessionMetadataData = field(default_factory=SessionMetadataData)
 
     # Legacy flat fields for migration compatibility
@@ -114,59 +115,59 @@ class SharedSessionData:
     session_name: str = "Unknown"
     track: str = "Unknown"
     track_configuration: str = "Unknown"
-    track_length_m: Optional[float] = None
+    track_length_m: float | None = None
     car: str = "Unknown"
-    player_name: Optional[str] = None
-    player_id: Optional[str] = None
-    car_uuid: Optional[str] = None
+    player_name: str | None = None
+    player_id: str | None = None
+    car_uuid: str | None = None
     weather: str = "Unknown"
     is_online: bool = False
     is_timed_race: bool = False
-    event_id: Optional[int] = None
+    event_id: int | None = None
 
-    lap_times: Dict[int, float] = field(default_factory=dict)
-    lap_times_graphics: Dict[int, float] = field(default_factory=dict)
-    lap_times_logs: Dict[int, float] = field(default_factory=dict)
-    calc_lap_times: Dict[int, float] = field(default_factory=dict)
-    current_lap_time_ms: Optional[int] = None
-    last_lap_time_ms: Optional[int] = None
-    best_lap_time_ms: Optional[int] = None
-    ideal_lap_time_ms: Optional[int] = None
-    delta_time_ms: Optional[int] = None
+    lap_times: dict[int, float] = field(default_factory=dict)
+    lap_times_graphics: dict[int, float] = field(default_factory=dict)
+    lap_times_logs: dict[int, float] = field(default_factory=dict)
+    calc_lap_times: dict[int, float] = field(default_factory=dict)
+    current_lap_time_ms: int | None = None
+    last_lap_time_ms: int | None = None
+    best_lap_time_ms: int | None = None
+    ideal_lap_time_ms: int | None = None
+    delta_time_ms: int | None = None
 
-    sector_times: Dict[int, Dict[int, int]] = field(default_factory=dict)
+    sector_times: dict[int, dict[int, int]] = field(default_factory=dict)
 
-    lap_validity_flat: Dict[int, bool] = field(default_factory=dict)
-    is_current_lap_invalid: Optional[bool] = None
+    lap_validity_flat: dict[int, bool] = field(default_factory=dict)
+    is_current_lap_invalid: bool | None = None
 
-    lap_boundaries: Dict[int, int] = field(default_factory=dict)
-    lap_completion_timestamps: Dict[int, str] = field(default_factory=dict)
+    lap_boundaries: dict[int, int] = field(default_factory=dict)
+    lap_completion_timestamps: dict[int, str] = field(default_factory=dict)
 
-    current_fuel: Optional[float] = None
-    fuel_consumption_rate: Optional[float] = None
-    fuel_economy: Optional[float] = None
-    fuel_consumption: Dict[int, float] = field(default_factory=dict)
+    current_fuel: float | None = None
+    fuel_consumption_rate: float | None = None
+    fuel_economy: float | None = None
+    fuel_consumption: dict[int, float] = field(default_factory=dict)
 
-    total_laps: Optional[int] = None
-    current_lap: Optional[int] = None
-    session_phase: Optional[str] = None
-    session_time_left_ms: Optional[int] = None
-    current_pos: Optional[int] = None
-    total_drivers: Optional[int] = None
+    total_laps: int | None = None
+    current_lap: int | None = None
+    session_phase: str | None = None
+    session_time_left_ms: int | None = None
+    current_pos: int | None = None
+    total_drivers: int | None = None
 
-    car_setup: Dict[str, Any] = field(default_factory=dict)
-    assists_state: Dict[str, Any] = field(default_factory=dict)
+    car_setup: dict[str, Any] = field(default_factory=dict)
+    assists_state: dict[str, Any] = field(default_factory=dict)
 
-    max_speed: Optional[float] = None
+    max_speed: float | None = None
     tyre_compound: str = "Unknown"
     stint_number: int = 1
 
-    starting_ambient_temp_c: Optional[float] = None
-    starting_ground_temp_c: Optional[float] = None
-    starting_grip: Optional[str] = None
-    air_density: Optional[float] = None
+    starting_ambient_temp_c: float | None = None
+    starting_ground_temp_c: float | None = None
+    starting_grip: str | None = None
+    air_density: float | None = None
 
-    data_sources: Dict[str, Set[str]] = field(default_factory=dict)
+    data_sources: dict[str, set[str]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.session_metadata.session_id = self.session_id
@@ -186,11 +187,11 @@ class SharedSessionManager:
         self._session_data.data_sources[field_name].add(source)
 
     # New shared object access
-    def get_lap_validity_data(self, lap_num: int) -> Optional[LapValidityData]:
+    def get_lap_validity_data(self, lap_num: int) -> LapValidityData | None:
         with self._lock:
             return self._session_data.lap_validity.get(lap_num)
 
-    def get_lap_timing_data(self, lap_num: int) -> Optional[LapTimingData]:
+    def get_lap_timing_data(self, lap_num: int) -> LapTimingData | None:
         with self._lock:
             return self._session_data.lap_timing.get(lap_num)
 
@@ -202,7 +203,7 @@ class SharedSessionManager:
         with self._lock:
             return self._session_data.player_identification
 
-    def get_sector_split_data(self, lap_num: int) -> Optional[SectorSplitData]:
+    def get_sector_split_data(self, lap_num: int) -> SectorSplitData | None:
         with self._lock:
             return self._session_data.sector_splits.get(lap_num)
 
@@ -211,7 +212,7 @@ class SharedSessionManager:
             return self._session_data.session_metadata
 
     # Legacy accessors
-    def get_lap_time(self, lap_num: int) -> Optional[float]:
+    def get_lap_time(self, lap_num: int) -> float | None:
         with self._lock:
             # 1st priority: Graphics SHM timing state.
             graphics_time = self._session_data.lap_times_graphics.get(lap_num)
@@ -226,11 +227,11 @@ class SharedSessionManager:
             # 3rd priority: Derived telemetry timings.
             return self._session_data.calc_lap_times.get(lap_num)
 
-    def get_current_lap_time(self) -> Optional[int]:
+    def get_current_lap_time(self) -> int | None:
         with self._lock:
             return self._session_data.current_lap_time_ms
 
-    def get_sector_times(self, lap_num: int) -> Optional[Dict[int, int]]:
+    def get_sector_times(self, lap_num: int) -> dict[int, int] | None:
         with self._lock:
             return self._session_data.sector_times.get(lap_num)
 
@@ -238,14 +239,14 @@ class SharedSessionManager:
         with self._lock:
             return self._session_data.lap_validity_flat.get(lap_num, True)
 
-    def get_lap_state(self, lap_num: int) -> Optional[str]:
+    def get_lap_state(self, lap_num: int) -> str | None:
         with self._lock:
             lap_validity = self._session_data.lap_validity.get(lap_num)
             if lap_validity is None:
                 return None
             return "PUSH" if lap_validity.is_valid else "INVALID_GAME"
 
-    def get_car_setup(self) -> Dict[str, Any]:
+    def get_car_setup(self) -> dict[str, Any]:
         with self._lock:
             return dict(self._session_data.car_setup)
 
@@ -253,7 +254,7 @@ class SharedSessionManager:
         with self._lock:
             return self._session_data.car
 
-    def get_session_metadata(self) -> Dict[str, Any]:
+    def get_session_metadata(self) -> dict[str, Any]:
         with self._lock:
             md = self._session_data.session_metadata
             sources = self._session_data.data_sources
@@ -301,18 +302,18 @@ class SharedSessionManager:
                 "car_uuid": self._session_data.car_uuid,
             }
 
-    def get_best_lap_time(self) -> Optional[float]:
+    def get_best_lap_time(self) -> float | None:
         with self._lock:
             return min(self._session_data.lap_times.values()) if self._session_data.lap_times else None
 
-    def get_all_lap_times(self) -> Dict[int, float]:
+    def get_all_lap_times(self) -> dict[int, float]:
         with self._lock:
             lap_nums = (
                 set(self._session_data.lap_times_graphics)
                 | set(self._session_data.lap_times_logs)
                 | set(self._session_data.calc_lap_times)
             )
-            merged: Dict[int, float] = {}
+            merged: dict[int, float] = {}
             for lap_num in lap_nums:
                 value = self._session_data.lap_times_graphics.get(lap_num)
                 if value is None:
@@ -323,7 +324,7 @@ class SharedSessionManager:
                     merged[lap_num] = value
             return merged
 
-    def validate_data_consistency(self) -> Dict[str, list[str]]:
+    def validate_data_consistency(self) -> dict[str, list[str]]:
         issues: list[str] = []
         with self._lock:
             lap_nums = set(self._session_data.lap_times_graphics) | set(self._session_data.lap_times_logs)
@@ -334,15 +335,15 @@ class SharedSessionManager:
                     continue
                 if abs(graphics_time - logs_time) > 100.0:
                     issues.append(
-                        (
+                        
                             f"lap {lap_num}: graphics={int(graphics_time)}ms "
                             f"logs={int(logs_time)}ms"
-                        )
+                        
                     )
 
         return {"inconsistencies": issues}
 
-    def get_all_lap_validity(self) -> Dict[int, bool]:
+    def get_all_lap_validity(self) -> dict[int, bool]:
         with self._lock:
             return dict(self._session_data.lap_validity_flat)
 
@@ -363,7 +364,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_lap_timing_from_graphics_shm(self, lap_num: int, timing_data: Dict[str, Any]) -> None:
+    def update_lap_timing_from_graphics_shm(self, lap_num: int, timing_data: dict[str, Any]) -> None:
         with self._lock:
             current = self._session_data.lap_timing.get(lap_num)
             if current is None:
@@ -403,7 +404,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_fuel_from_graphics_shm(self, fuel_data: Dict[str, Any]) -> None:
+    def update_fuel_from_graphics_shm(self, fuel_data: dict[str, Any]) -> None:
         with self._lock:
             current_fuel = fuel_data.get("fuel_liter_current_quantity")
             fuel_rate = fuel_data.get("fuel_liter_per_km")
@@ -426,7 +427,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_player_identification_from_logs(self, player_data: Dict[str, Any]) -> None:
+    def update_player_identification_from_logs(self, player_data: dict[str, Any]) -> None:
         with self._lock:
             ident = self._session_data.player_identification
             ident.steam_id = player_data.get("steam_id") or ident.steam_id
@@ -446,7 +447,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_sector_splits_from_logs(self, lap_num: int, sector_data: Dict[str, Any]) -> None:
+    def update_sector_splits_from_logs(self, lap_num: int, sector_data: dict[str, Any]) -> None:
         with self._lock:
             splits = SectorSplitData(
                 lap_number=lap_num,
@@ -457,7 +458,7 @@ class SharedSessionManager:
             )
             self._session_data.sector_splits[lap_num] = splits
 
-            legacy: Dict[int, int] = {}
+            legacy: dict[int, int] = {}
             if splits.sector1_ms is not None:
                 legacy[1] = splits.sector1_ms
             if splits.sector2_ms is not None:
@@ -471,7 +472,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_session_metadata_from_static_shm(self, metadata: Dict[str, Any]) -> None:
+    def update_session_metadata_from_static_shm(self, metadata: dict[str, Any]) -> None:
         with self._lock:
             md = self._session_data.session_metadata
             md.session_id = self._session_data.session_id
@@ -510,8 +511,8 @@ class SharedSessionManager:
         self.notify_observers()
 
     # Legacy update entry points
-    def update_lap_from_logs(self, lap_data: LapData, session_data: Optional[SessionData] = None) -> None:
-        player_payload: Dict[str, Any] = {}
+    def update_lap_from_logs(self, lap_data: LapData, session_data: SessionData | None = None) -> None:
+        player_payload: dict[str, Any] = {}
         if session_data is not None:
             with self._lock:
                 self._session_data.session_id = session_data.session_id
@@ -589,10 +590,10 @@ class SharedSessionManager:
         for lap in log_session_data.laps:
             self.update_lap_from_logs(lap, session_data=log_session_data)
 
-    def update_from_static_shm(self, static_data: Dict[str, Any]) -> None:
+    def update_from_static_shm(self, static_data: dict[str, Any]) -> None:
         self.update_session_metadata_from_static_shm(static_data)
 
-    def update_from_graphics_shm(self, graphics_data: Dict[str, Any]) -> None:
+    def update_from_graphics_shm(self, graphics_data: dict[str, Any]) -> None:
         current_lap = int(graphics_data.get("session_current_lap") or 0)
         if current_lap > 0:
             self.update_lap_timing_from_graphics_shm(current_lap, graphics_data)
@@ -618,7 +619,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_from_physics_shm(self, physics_data: Dict[str, Any]) -> None:
+    def update_from_physics_shm(self, physics_data: dict[str, Any]) -> None:
         with self._lock:
             speed_kmh = physics_data.get("speed_kmh")
             if isinstance(speed_kmh, (int, float)):
@@ -641,7 +642,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def update_from_telemetry(self, telemetry_data: Dict[str, Any]) -> None:
+    def update_from_telemetry(self, telemetry_data: dict[str, Any]) -> None:
         with self._lock:
             max_speed = telemetry_data.get("max_speed")
             if isinstance(max_speed, (int, float)):
@@ -659,7 +660,7 @@ class SharedSessionManager:
 
         self.notify_observers()
 
-    def get_data_sources(self) -> Dict[str, Set[str]]:
+    def get_data_sources(self) -> dict[str, set[str]]:
         """Return a snapshot of data source tracking (thread-safe)."""
         with self._lock:
             return {k: set(v) for k, v in self._session_data.data_sources.items()}
@@ -703,7 +704,7 @@ class SharedSessionManager:
     def to_legacy_session_data(self) -> SessionData:
         return LegacySessionDataWrapper(self).to_session_data()
 
-    def get_legacy_wrapper(self) -> "LegacySessionDataWrapper":
+    def get_legacy_wrapper(self) -> LegacySessionDataWrapper:
         return LegacySessionDataWrapper(self)
 
 

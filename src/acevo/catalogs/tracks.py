@@ -3,8 +3,6 @@
 import json
 import os
 from pathlib import Path
-from typing import Optional, Tuple
-
 
 # Path to track catalog JSON file
 _CATALOG_PATH = Path(__file__).parent / "data" / "track_catalog.json"
@@ -15,7 +13,7 @@ def _load_catalog() -> dict:
     if not _CATALOG_PATH.exists():
         raise FileNotFoundError(f"Track catalog not found at {_CATALOG_PATH}")
     
-    with open(_CATALOG_PATH, "r", encoding="utf-8") as f:
+    with open(_CATALOG_PATH, encoding="utf-8") as f:
         catalog = json.load(f)
     
     # Schema validation
@@ -99,11 +97,11 @@ def select_track_profile(
         # Search aliases
         for track_key, track in TRACK_CATALOG.items():
             labels = [track_key, *track.get("aliases", [])]
-            if track_name.lower() in [l.lower() for l in labels]:
+            if track_name.lower() in [label.lower() for label in labels]:
                 if config_name:
                     for config_key, config in track["configs"].items():
                         config_labels = [config_key, *config.get("aliases", [])]
-                        if config_name.lower() in [l.lower() for l in config_labels]:
+                        if config_name.lower() in [label.lower() for label in config_labels]:
                             return track_key, build_track_profile(track_key, config_key)
                 return track_key, build_track_profile(track_key, track["default_config"])
         return None, None

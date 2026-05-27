@@ -11,7 +11,7 @@ import struct
 from dataclasses import dataclass
 from enum import Enum
 from io import BytesIO
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class AC_STATUS(Enum):
@@ -67,29 +67,29 @@ class Physics:
     speed_kmh: float
     velocity: Coords
     acc_g: Coords
-    wheel_slip: List[float]
-    wheel_load: List[float]
-    wheels_pressure: List[float]
-    wheel_angular_speed: List[float]
-    tyre_wear: List[float]
-    tyre_dirty_level: List[float]
-    tyre_core_temp: List[float]
-    camber_rad: List[float]
-    suspension_travel: List[float]
+    wheel_slip: list[float]
+    wheel_load: list[float]
+    wheels_pressure: list[float]
+    wheel_angular_speed: list[float]
+    tyre_wear: list[float]
+    tyre_dirty_level: list[float]
+    tyre_core_temp: list[float]
+    camber_rad: list[float]
+    suspension_travel: list[float]
     drs: float
     tc: float
     heading: float
     pitch: float
     roll: float
     cg_height: float
-    car_damage: List[float]
+    car_damage: list[float]
     number_of_tyres_out: int
     pit_limiter_on: bool
     abs: float
     kers_charge: float
     kers_input: float
     auto_shifter_on: bool
-    ride_height: List[float]
+    ride_height: list[float]
     turbo_boost: float
     ballast: float
     air_density: float
@@ -106,36 +106,36 @@ class Physics:
     kers_current_kj: float
     drs_available: bool
     drs_enabled: bool
-    brake_temp: List[float]
+    brake_temp: list[float]
     clutch: float
-    tyre_temp_i: List[float]
-    tyre_temp_m: List[float]
-    tyre_temp_o: List[float]
+    tyre_temp_i: list[float]
+    tyre_temp_m: list[float]
+    tyre_temp_o: list[float]
     is_ai_controlled: bool
-    tyre_contact_point: List[Coords]
-    tyre_contact_normal: List[Coords]
-    tyre_contact_heading: List[Coords]
+    tyre_contact_point: list[Coords]
+    tyre_contact_normal: list[Coords]
+    tyre_contact_heading: list[Coords]
     brake_bias: float
     local_velocity: Coords
     # AC Evo precision fields
     p2p_activations: int
     p2p_status: int
     current_max_rpm: int
-    mz: List[float]
-    fx: List[float]
-    fy: List[float]
-    slip_ratio: List[float]
-    slip_angle: List[float]
+    mz: list[float]
+    fx: list[float]
+    fy: list[float]
+    slip_ratio: list[float]
+    slip_angle: list[float]
     tcin_action: bool
     absin_action: bool
-    suspension_damage: List[float]
-    tyre_temp: List[float]
+    suspension_damage: list[float]
+    tyre_temp: list[float]
     water_temp: float
-    brake_torque: List[float]
+    brake_torque: list[float]
     front_brake_compound: int
     rear_brake_compound: int
-    pad_life: List[float]
-    disc_life: List[float]
+    pad_life: list[float]
+    disc_life: list[float]
     ignition_on: bool
     starter_engine_on: bool
     is_engine_running: bool
@@ -162,12 +162,12 @@ class R:
         self._pos += 4
         return val
 
-    def fa(self, n: int) -> List[float]:
+    def fa(self, n: int) -> list[float]:
         vals = list(struct.unpack(f"={n}f", self._b.read(4 * n)))
         self._pos += 4 * n
         return vals
 
-    def ia(self, n: int) -> List[int]:
+    def ia(self, n: int) -> list[int]:
         vals = list(struct.unpack(f"={n}i", self._b.read(4 * n)))
         self._pos += 4 * n
         return vals
@@ -177,7 +177,7 @@ class R:
         self._pos += 12
         return Coords(x, y, z)
 
-    def coords_list(self, n: int) -> List[Coords]:
+    def coords_list(self, n: int) -> list[Coords]:
         coords = []
         for _ in range(n):
             coords.append(self.coords())
@@ -193,14 +193,14 @@ class R:
         self._pos += n
 
 
-def _enum_name(enum_cls, value: int) -> Optional[str]:
+def _enum_name(enum_cls, value: int) -> str | None:
     try:
         return enum_cls(value).name
     except ValueError:
         return None
 
 
-def _coords_to_dict(coords: Coords) -> Dict[str, float]:
+def _coords_to_dict(coords: Coords) -> dict[str, float]:
     return {"x": coords.x, "y": coords.y, "z": coords.z}
 
 
@@ -218,8 +218,8 @@ def _has_meaningful_value(value: Any) -> bool:
     return value is not None
 
 
-def _scan_utf16_strings(data: bytes, min_chars: int = 4, start_offset: int = 0) -> List[Dict[str, Any]]:
-    strings: List[Dict[str, Any]] = []
+def _scan_utf16_strings(data: bytes, min_chars: int = 4, start_offset: int = 0) -> list[dict[str, Any]]:
+    strings: list[dict[str, Any]] = []
     cursor_start = start_offset if start_offset % 2 == 0 else start_offset + 1
     last_end = -1
 
@@ -227,7 +227,7 @@ def _scan_utf16_strings(data: bytes, min_chars: int = 4, start_offset: int = 0) 
         if start < last_end:
             continue
 
-        chars: List[str] = []
+        chars: list[str] = []
         cursor = start
         while cursor + 1 < len(data):
             lo = data[cursor]
@@ -244,7 +244,7 @@ def _scan_utf16_strings(data: bytes, min_chars: int = 4, start_offset: int = 0) 
     return strings
 
 
-def _word_candidate(data: bytes, offset: int, field: str) -> Dict[str, Any]:
+def _word_candidate(data: bytes, offset: int, field: str) -> dict[str, Any]:
     return {
         "field": field,
         "offset": offset,
@@ -261,7 +261,7 @@ def _is_finite_number(value: Any) -> bool:
         return False
 
 
-def _sanitize_float_field(result: Dict[str, Any], field: str, invalid_reasons: List[str], low: float, high: float) -> None:
+def _sanitize_float_field(result: dict[str, Any], field: str, invalid_reasons: list[str], low: float, high: float) -> None:
     value = result.get(field)
     if value is None:
         return
@@ -277,7 +277,7 @@ def _sanitize_float_field(result: Dict[str, Any], field: str, invalid_reasons: L
     result[field] = value
 
 
-def _sanitize_int_field(result: Dict[str, Any], field: str, invalid_reasons: List[str], low: int, high: int) -> None:
+def _sanitize_int_field(result: dict[str, Any], field: str, invalid_reasons: list[str], low: int, high: int) -> None:
     value = result.get(field)
     if value is None:
         return
@@ -294,11 +294,11 @@ def _sanitize_int_field(result: Dict[str, Any], field: str, invalid_reasons: Lis
     result[field] = value
 
 
-def _sanitize_coords(value: Any, invalid_reasons: List[str], field: str, abs_max: float) -> Optional[Dict[str, Optional[float]]]:
+def _sanitize_coords(value: Any, invalid_reasons: list[str], field: str, abs_max: float) -> dict[str, float | None] | None:
     if not isinstance(value, dict):
         return None
 
-    cleaned: Dict[str, Optional[float]] = {}
+    cleaned: dict[str, float | None] = {}
     for axis in ("x", "y", "z"):
         axis_value = value.get(axis)
         if axis_value is None:
@@ -318,7 +318,7 @@ def _sanitize_coords(value: Any, invalid_reasons: List[str], field: str, abs_max
     return cleaned
 
 
-def _sanitize_float_list(value: Any, invalid_reasons: List[str], field: str, low: float, high: float) -> Any:
+def _sanitize_float_list(value: Any, invalid_reasons: list[str], field: str, low: float, high: float) -> Any:
     if not isinstance(value, list):
         return value
 
@@ -340,8 +340,8 @@ def _sanitize_float_list(value: Any, invalid_reasons: List[str], field: str, low
     return cleaned
 
 
-def _sanitize_physics_payload(result: Dict[str, Any]) -> Dict[str, Any]:
-    invalid_reasons: List[str] = []
+def _sanitize_physics_payload(result: dict[str, Any]) -> dict[str, Any]:
+    invalid_reasons: list[str] = []
 
     result["decode_source"] = result.get("_decoder")
     _sanitize_float_field(result, "gas", invalid_reasons, 0.0, 1.05)
@@ -408,8 +408,8 @@ def _sanitize_physics_payload(result: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def _sanitize_graphics_payload(result: Dict[str, Any]) -> Dict[str, Any]:
-    invalid_reasons: List[str] = []
+def _sanitize_graphics_payload(result: dict[str, Any]) -> dict[str, Any]:
+    invalid_reasons: list[str] = []
 
     result["decode_source"] = result.get("_decoder")
     _sanitize_int_field(result, "completed_laps", invalid_reasons, 0, 10000)
@@ -460,7 +460,7 @@ def _sanitize_graphics_payload(result: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def decode_physics_ac(data: bytes) -> Optional[Physics]:
+def decode_physics_ac(data: bytes) -> Physics | None:
     """Try to decode physics using AC/ACC structure."""
     try:
         r = R(data)
@@ -733,7 +733,7 @@ def _read_cstring(data: bytes, offset: int, max_length: int) -> str:
         return ""
 
 
-def decode_graphics_evo(data: bytes) -> Optional[Dict[str, Any]]:
+def decode_graphics_evo(data: bytes) -> dict[str, Any] | None:
     """Decode the AC Evo ``SPageFileGraphicEvo`` shared-memory region.
 
     Returns ``None`` if the buffer is too small or fails sanity checks.
@@ -1102,7 +1102,7 @@ def decode_graphics_evo(data: bytes) -> Optional[Dict[str, Any]]:
     }
 
 
-def decode_graphics_ac(data: bytes) -> Optional[Dict[str, Any]]:
+def decode_graphics_ac(data: bytes) -> dict[str, Any] | None:
     try:
         if len(data) < GRAPHICS_STRUCT_SIZE:
             return None
@@ -1292,7 +1292,7 @@ ACEVO_STARTING_GRIP = {
 }
 
 
-def decode_static_evo(data: bytes) -> Optional[Dict[str, Any]]:
+def decode_static_evo(data: bytes) -> dict[str, Any] | None:
     """Decode the AC Evo ``SPageFileStaticEvo`` shared-memory region.
 
     Returns ``None`` if the buffer is too small or fails sanity checks.
@@ -1379,7 +1379,7 @@ def decode_static_evo(data: bytes) -> Optional[Dict[str, Any]]:
     }
 
 
-def decode_static_ac(data: bytes) -> Optional[Dict[str, Any]]:
+def decode_static_ac(data: bytes) -> dict[str, Any] | None:
     try:
         if len(data) < STATIC_HEADER_SIZE:
             return None
@@ -1489,7 +1489,7 @@ def decode_static_ac(data: bytes) -> Optional[Dict[str, Any]]:
         return None
 
 
-def decode_physics_fallback(data: bytes) -> Dict[str, Any]:
+def decode_physics_fallback(data: bytes) -> dict[str, Any]:
     """Fallback pattern detection for unknown structures."""
     result = {
         "_decoder": "fallback",
@@ -1528,7 +1528,7 @@ def decode_physics_fallback(data: bytes) -> Dict[str, Any]:
     return result
 
 
-def decode_graphics_fallback(data: bytes) -> Dict[str, Any]:
+def decode_graphics_fallback(data: bytes) -> dict[str, Any]:
     """Fallback pattern detection for graphics data."""
     result = {
         "_decoder": "fallback",
@@ -1561,7 +1561,7 @@ def decode_graphics_fallback(data: bytes) -> Dict[str, Any]:
     return result
 
 
-def decode_static_fallback(data: bytes) -> Dict[str, Any]:
+def decode_static_fallback(data: bytes) -> dict[str, Any]:
     """Fallback pattern detection for static data."""
     result = {"_decoder": "fallback", "size": len(data)}
 
@@ -1571,7 +1571,7 @@ def decode_static_fallback(data: bytes) -> Dict[str, Any]:
     return result
 
 
-def decode_physics(data: bytes) -> Dict[str, Any]:
+def decode_physics(data: bytes) -> dict[str, Any]:
     """Decode physics with AC/ACC structure fallback."""
     physics = decode_physics_ac(data)
     if physics:
@@ -1580,7 +1580,7 @@ def decode_physics(data: bytes) -> Dict[str, Any]:
     return decode_physics_fallback(data)
 
 
-def decode_graphics(data: bytes) -> Dict[str, Any]:
+def decode_graphics(data: bytes) -> dict[str, Any]:
     """Decode graphics with fallback.
 
     Tries the AC Evo ``SPageFileGraphicEvo`` decoder first (current target
@@ -1596,7 +1596,7 @@ def decode_graphics(data: bytes) -> Dict[str, Any]:
     return decode_graphics_fallback(data)
 
 
-def decode_static(data: bytes) -> Dict[str, Any]:
+def decode_static(data: bytes) -> dict[str, Any]:
     """Decode static with fallback.
 
     Tries the AC Evo ``SPageFileStaticEvo`` decoder first (current target
@@ -1612,7 +1612,7 @@ def decode_static(data: bytes) -> Dict[str, Any]:
     return decode_static_fallback(data)
 
 
-def physics_to_dict(physics_data: Any) -> Dict[str, Any]:
+def physics_to_dict(physics_data: Any) -> dict[str, Any]:
     """Convert physics data (dataclass or dict) to a flat dictionary."""
     if isinstance(physics_data, dict):
         return physics_data
@@ -1635,14 +1635,14 @@ def physics_to_dict(physics_data: Any) -> Dict[str, Any]:
     return {"error": "Unknown physics data type"}
 
 
-def graphics_to_dict(graphics_data: Dict[str, Any]) -> Dict[str, Any]:
+def graphics_to_dict(graphics_data: dict[str, Any]) -> dict[str, Any]:
     """Convert graphics data to a flat dictionary."""
     if isinstance(graphics_data, dict):
         return graphics_data
     return {"error": "Unknown graphics data type"}
 
 
-def static_to_dict(static_data: Dict[str, Any]) -> Dict[str, Any]:
+def static_to_dict(static_data: dict[str, Any]) -> dict[str, Any]:
     """Convert static data to a flat dictionary."""
     if isinstance(static_data, dict):
         return static_data

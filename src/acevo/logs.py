@@ -5,52 +5,46 @@ Based on deep multi-log analysis + engineering review of v2.
 This module imports reusable SDK data models from acevo.
 """
 
-import re
-import os
-import sys
-import time
 import asyncio
+import os
+import re
+import time
+from collections.abc import Awaitable, Callable
 from datetime import datetime
-from typing import Optional, Callable, Awaitable
 from pathlib import Path
 
-from .models import (
-    LapState,
-    InProgressLap,
-    StintData,
-    LapData,
-    SessionData,
-)
-from .shared_session import (
-    SharedSessionManager,
-)
-from .tyre_state import (
-    TyreState,
+from ._logging import Component, log_debug
+from .constants import (
+    HYBRID_FUEL_THRESHOLD_L,
+    HYBRID_SPIKE_SESSION_THRESHOLD,
+    KNOWN_HYBRID_CARS,
+    PIT_TELEPORT_DISTANCE_M,
+    PRACTICE_LIKE,
+    RACE_LIKE,
+    SECTOR_SUM_TOLERANCE_MS,
+    SESSION_TYPE_MAP,
+    TRACK_LIMIT_INVALIDATION_THRESHOLD_M,
 )
 from .context import (
     LogContext,
 )
-from .constants import (
-    PIT_TELEPORT_DISTANCE_M,
-    TRACK_LIMIT_INVALIDATION_THRESHOLD_M,
-    SECTOR_SUM_TOLERANCE_MS,
-    HYBRID_FUEL_THRESHOLD_L,
-    HYBRID_SPIKE_SESSION_THRESHOLD,
-    MIN_FULL_LAP_HUNDREDM,
-    KNOWN_HYBRID_CARS,
-    SESSION_TYPE_MAP,
-    PRACTICE_LIKE,
-    RACE_LIKE,
+from .models import (
+    InProgressLap,
+    LapData,
+    LapState,
+    SessionData,
+    StintData,
 )
-from ._logging import log_debug, Component
-
+from .shared_session import (
+    SharedSessionManager,
+)
 
 # ─── Callback type aliases ────────────────────────────────────────────────────
 
 LapCallback          = Callable[[SessionData, LapData], Awaitable[None]]
 StatusCallback       = Callable[[str], Awaitable[None]]
 GameStatusCallback   = Callable[[bool], Awaitable[None]]
-UserDetectedCallback = Callable[[str, Optional[str]], Awaitable[None]]
+UserDetectedCallback = Callable[[str, str | None], Awaitable[None]]
 GameVersionCallback  = Callable[[str], Awaitable[None]]
 SessionEndCallback   = Callable[[], Awaitable[None]]
 SessionRestartCallback = Callable[[], Awaitable[None]]
@@ -68,7 +62,7 @@ class LogParser:
     DEFAULT_LOG_PATH = DEFAULT_LOG_DIR
 
     @staticmethod
-    def _find_latest_log(log_dir: Path) -> Optional[Path]:
+    def _find_latest_log(log_dir: Path) -> Path | None:
         """Return the most recently modified .txt file in log_dir, or None."""
         try:
             files = list(log_dir.glob("*.txt"))
@@ -80,19 +74,19 @@ class LogParser:
 
     def __init__(
         self,
-        log_path: Optional[str] = None,
-        on_lap_complete: Optional[LapCallback] = None,
-        on_status_change: Optional[StatusCallback] = None,
-        on_game_status_change: Optional[GameStatusCallback] = None,
-        on_user_detected: Optional[UserDetectedCallback] = None,
-        on_game_version: Optional[GameVersionCallback] = None,
-        on_session_end: Optional[SessionEndCallback] = None,
-        on_session_restart: Optional[SessionRestartCallback] = None,
-        session_manager: Optional[SharedSessionManager] = None,
+        log_path: str | None = None,
+        on_lap_complete: LapCallback | None = None,
+        on_status_change: StatusCallback | None = None,
+        on_game_status_change: GameStatusCallback | None = None,
+        on_user_detected: UserDetectedCallback | None = None,
+        on_game_version: GameVersionCallback | None = None,
+        on_session_end: SessionEndCallback | None = None,
+        on_session_restart: SessionRestartCallback | None = None,
+        session_manager: SharedSessionManager | None = None,
     ) -> None:
         _path = Path(log_path) if log_path else self.DEFAULT_LOG_DIR
         if _path.is_dir() or (not _path.suffix and not _path.is_file()):
-            self._log_dir: Optional[Path] = _path
+            self._log_dir: Path | None = _path
             _latest = self._find_latest_log(_path)
             self.log_path = _latest if _latest is not None else _path / "log.txt"
         else:
@@ -108,11 +102,11 @@ class LogParser:
         self._session_manager = session_manager or SharedSessionManager()
         
         # Track last emitted game status to prevent duplicate events
-        self._last_emitted_game_status: Optional[bool] = None
+        self._last_emitted_game_status: bool | None = None
         self._session_active_from_logs: bool = False
 
         self.sessions: list[SessionData] = []
-        self.current_session: Optional[SessionData] = None
+        self.current_session: SessionData | None = None
         self.context = LogContext()
 
         # In-progress lap accumulator
@@ -126,22 +120,22 @@ class LogParser:
         # Buffering by exactly one lap lets the authoritative game flag
         # override our local sector-sum / split heuristics before the lap is
         # emitted to listeners.
-        self._pending_lap: Optional[LapData] = None
+        self._pending_lap: LapData | None = None
 
         # Stint tracking
-        self._current_stint: Optional[StintData] = None
+        self._current_stint: StintData | None = None
 
         # In-memory log buffer (for export / diagnostics)
         self.log_buffer: list[str] = []
         self.max_log_lines: int = 100_000
 
-        self._last_activity_ts: Optional[float] = None
+        self._last_activity_ts: float | None = None
         self._running: bool = False
         self._emit_callbacks: bool = False
         
         # Track last seen car ID for compound detection
-        self._last_car_uuid: Optional[str] = None
-        self._pending_compound_ts: Optional[str] = None
+        self._last_car_uuid: str | None = None
+        self._pending_compound_ts: str | None = None
         self._pending_compound_updates: dict[int, str] = {}
         self._pending_compound_confirmed: set[int] = set()
 
@@ -271,7 +265,7 @@ class LogParser:
             return int(parts[0]) * 1000 + int(parts[1].ljust(3, "0")[:3])
         return 0
 
-    def _extract_line_timestamp(self, line: str) -> Optional[str]:
+    def _extract_line_timestamp(self, line: str) -> str | None:
         if not line.startswith("["):
             return None
         end = line.find("]")
@@ -280,7 +274,7 @@ class LogParser:
         return line[1:end]
 
     @staticmethod
-    def _normalize_car_uuid(car_uuid: Optional[str]) -> str:
+    def _normalize_car_uuid(car_uuid: str | None) -> str:
         return (car_uuid or "").replace("-", "").lower()
 
     def _is_player_car(self, car_uuid: str) -> bool:
@@ -361,7 +355,7 @@ class LogParser:
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(self.log_buffer))
             return True
-        except (OSError, IOError) as exc:
+        except OSError as exc:
             log_debug(Component.LOG_PARSER, f"[ERROR] export_logs_to_file: {exc}")
             return False
 
@@ -387,7 +381,7 @@ class LogParser:
             except (RuntimeError, asyncio.CancelledError) as exc:
                 log_debug(Component.LOG_PARSER, f"[ERROR] on_lap_complete: {exc}")
 
-    def _sync_shared_session(self, session: Optional[SessionData]) -> None:
+    def _sync_shared_session(self, session: SessionData | None) -> None:
         if session is None:
             return
         self._session_manager.update_from_logs(
@@ -469,7 +463,7 @@ class LogParser:
                 log_debug(Component.LOG_PARSER, f"[ERROR] on_session_restart: {exc}")
 
     async def _emit_user_detected(
-        self, steam_id: str, player_name: Optional[str]
+        self, steam_id: str, player_name: str | None
     ) -> None:
         log_debug(Component.LOG_PARSER, f"[USER] steam_id={steam_id} name={player_name}")
         if self.on_user_detected:
@@ -783,7 +777,7 @@ class LogParser:
             if self.current_session:
                 self.current_session.weather = suffix
 
-    def _serialize_setup_notes(self) -> Optional[str]:
+    def _serialize_setup_notes(self) -> str | None:
         if not self.context.setup_values:
             return None
         rows: list[str] = []
@@ -1202,7 +1196,7 @@ class LogParser:
 
     # ── Lap completion ────────────────────────────────────────────────────────
 
-    def _handle_lap_complete(self, line: str) -> Optional[LapData]:
+    def _handle_lap_complete(self, line: str) -> LapData | None:
         if "New lap carId" not in line:
             return None
         m = self._pats["lap_finish"].search(line)
@@ -1222,9 +1216,9 @@ class LogParser:
         split_times: list[int] = [ip.splits[key] for key in split_keys]
 
         # ── Sector extraction ─────────────────────────────────────────────────
-        s1: Optional[int] = ip.splits.get(0)
-        s2: Optional[int] = ip.splits.get(1)
-        s3: Optional[int] = ip.splits.get(2)
+        s1: int | None = ip.splits.get(0)
+        s2: int | None = ip.splits.get(1)
+        s3: int | None = ip.splits.get(2)
 
         # S1 corruption check — race grid start produces an inflated time in
         # slot 0 (cumulative time before the player crosses the start/finish
@@ -1263,7 +1257,7 @@ class LogParser:
         is_valid = lap_state == LapState.PUSH
 
         # ── Sector consistency flag ────────────────────────────────────────────
-        sectors_consistent: Optional[bool] = None
+        sectors_consistent: bool | None = None
         if len(split_times) >= 2:
             sectors_consistent = (
                 abs(sum(split_times) - lap_time_ms) <= SECTOR_SUM_TOLERANCE_MS
@@ -1337,7 +1331,7 @@ class LogParser:
 
     # ── Authoritative validity (from network broadcast) ──────────────────────
 
-    def _handle_lap_validity(self, line: str) -> Optional[LapData]:
+    def _handle_lap_validity(self, line: str) -> LapData | None:
         """Apply the game's authoritative per-lap validity flag.
 
         AC Evo emits a `[network] [info] Relevant onSplit for Combo …:
@@ -1408,7 +1402,7 @@ class LogParser:
         )
         return pending
 
-    def _flush_pending_lap(self) -> Optional[LapData]:
+    def _flush_pending_lap(self) -> LapData | None:
         """Append any buffered lap to the session with its heuristic state.
 
         Used at session end / file EOF where no further authoritative
@@ -1428,7 +1422,7 @@ class LogParser:
 
     # ── Aborted lap emission ──────────────────────────────────────────────────
 
-    def _maybe_emit_aborted_lap(self) -> Optional[LapData]:
+    def _maybe_emit_aborted_lap(self) -> LapData | None:
         """Produce an ABORTED LapData if the in-progress lap has meaningful data.
 
         Called when a session ends unexpectedly (game quit, session change)
@@ -1521,7 +1515,7 @@ class LogParser:
 
     # ── Master line processor ─────────────────────────────────────────────────
 
-    def _process_line(self, line: str) -> Optional[LapData]:
+    def _process_line(self, line: str) -> LapData | None:
         """Process one raw log line. Returns LapData when a lap completes."""
         line = line.strip()
         if not line:
@@ -1596,7 +1590,7 @@ class LogParser:
             return []
 
         await self._emit_status(f"Parsing {self.log_path} …")
-        with open(self.log_path, "r", encoding="utf-8", errors="ignore") as fh:
+        with open(self.log_path, encoding="utf-8", errors="ignore") as fh:
             for line in fh:
                 completed = self._process_line(line)
                 if completed and self.current_session:
@@ -1639,7 +1633,7 @@ class LogParser:
             await self._emit_status("Reading existing log …")
             _restart = False
 
-            with open(self.log_path, "r", encoding="utf-8", errors="ignore") as fh:
+            with open(self.log_path, encoding="utf-8", errors="ignore") as fh:
 
                 # ── Historical pass ────────────────────────────────────────────────
                 historical_laps = 0
@@ -1788,8 +1782,8 @@ class LogParser:
     def is_running(self) -> bool:
         return self._running
 
-    def get_current_session(self) -> Optional[SessionData]:
+    def get_current_session(self) -> SessionData | None:
         return self.current_session
 
-    def get_player_id(self) -> Optional[str]:
+    def get_player_id(self) -> str | None:
         return self.context.player_id

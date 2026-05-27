@@ -4,7 +4,6 @@ ACE Log Parser Context
 Persistent parsing context that survives across session boundaries.
 """
 
-from typing import Optional
 from .tyre_state import TyreState
 
 
@@ -15,9 +14,9 @@ class LogContext:
         self.game_version: str = "Unknown"
         self.current_track: str = "Unknown"
         self.current_car: str = "Unknown"
-        self.player_name: Optional[str] = None
-        self.player_id: Optional[str] = None
-        self.car_uuid: Optional[str] = None
+        self.player_name: str | None = None
+        self.player_id: str | None = None
+        self.car_uuid: str | None = None
         self.weather: str = "Unknown"
         self.car_is_hybrid: bool = False
 

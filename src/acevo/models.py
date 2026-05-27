@@ -4,12 +4,10 @@ ACE Log Parser Models
 Data models for lap, session, stint, and tyre tracking.
 """
 
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
-import uuid
-
 
 # ─── LapState enum ────────────────────────────────────────────────────────────
 
@@ -48,14 +46,14 @@ class InProgressLap:
     split_end_confirmed: bool = False
 
     # Energy-source event (fires once, just before New lap)
-    fuel_used: Optional[float] = None
+    fuel_used: float | None = None
     fuel_reliable: bool = True
 
     # Distance covered this lap (hundredmeters counter delta)
-    distance_hundredm: Optional[int] = None
+    distance_hundredm: int | None = None
 
     # Physics engine lap counter (evOnLapCompleted N)
-    physics_lap_num: Optional[int] = None
+    physics_lap_num: int | None = None
 
     def reset(self) -> None:
         self.__init__()  # type: ignore[misc]
@@ -76,19 +74,19 @@ class StintData:
         return len(self.lap_numbers)
 
     @property
-    def fuel_used_total(self) -> Optional[float]:
+    def fuel_used_total(self) -> float | None:
         return self._fuel_total
 
     @property
-    def fuel_per_lap_avg(self) -> Optional[float]:
+    def fuel_per_lap_avg(self) -> float | None:
         if self._fuel_total is not None and self.lap_count > 0:
             return round(self._fuel_total / self.lap_count, 3)
         return None
 
     # Internal accumulator — use add_lap()
-    _fuel_total: Optional[float] = field(default=None, repr=False)
+    _fuel_total: float | None = field(default=None, repr=False)
 
-    def add_lap(self, lap_number: int, fuel_used: Optional[float]) -> None:
+    def add_lap(self, lap_number: int, fuel_used: float | None) -> None:
         self.lap_numbers.append(lap_number)
         if fuel_used is not None and fuel_used > 0:
             self._fuel_total = (self._fuel_total or 0.0) + fuel_used
@@ -111,27 +109,27 @@ class LapData:
     """An immutable snapshot of one completed (or aborted) lap."""
 
     lap_number: int                        # 1-indexed within session
-    physics_lap_number: Optional[int]      # from evOnLapCompleted N; ground truth
+    physics_lap_number: int | None      # from evOnLapCompleted N; ground truth
     lap_time_ms: int
     lap_time_str: str
 
-    sector1_ms: Optional[int] = None
-    sector2_ms: Optional[int] = None
-    sector3_ms: Optional[int] = None
-    sectors_consistent: Optional[bool] = None  # |S1+S2+S3 − lap_time| ≤ 50 ms
+    sector1_ms: int | None = None
+    sector2_ms: int | None = None
+    sector3_ms: int | None = None
+    sectors_consistent: bool | None = None  # |S1+S2+S3 − lap_time| ≤ 50 ms
 
     lap_state: LapState = field(default_factory=lambda: LapState.PUSH)
     lap_type: str = "PUSH"               # String alias of lap_state.value (compat)
     is_valid: bool = True
 
-    fuel_used: Optional[float] = None
+    fuel_used: float | None = None
     fuel_reliable: bool = True
 
     tyre_compound: str = "Unknown"
     stint_number: int = 1
 
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    distance_hundredm: Optional[int] = None
+    distance_hundredm: int | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -167,14 +165,14 @@ class SessionData:
     car: str = "Unknown"
     track: str = "Unknown"
     weather: str = "Unknown"
-    player_name: Optional[str] = None
-    player_id: Optional[str] = None
-    car_uuid: Optional[str] = None
+    player_name: str | None = None
+    player_id: str | None = None
+    car_uuid: str | None = None
     tyre_compound: str = "Unknown"     # Compound at session end
     initial_fuel: float = 0.0
     fuel_used_session: float = 0.0
     fuel_reliable: bool = True
-    setup_notes: Optional[str] = None
+    setup_notes: str | None = None
     start_time: str = field(default_factory=lambda: datetime.now().isoformat())
     laps: list[LapData] = field(default_factory=list)
     stints: list[StintData] = field(default_factory=list)
@@ -183,12 +181,12 @@ class SessionData:
 
     @property
     def valid_laps(self) -> list[LapData]:
-        return [l for l in self.laps if l.is_valid]
+        return [lap for lap in self.laps if lap.is_valid]
 
     @property
-    def best_lap(self) -> Optional[LapData]:
+    def best_lap(self) -> LapData | None:
         valid = self.valid_laps
-        return min(valid, key=lambda l: l.lap_time_ms) if valid else None
+        return min(valid, key=lambda lap: lap.lap_time_ms) if valid else None
 
     def to_dict(self) -> dict:
         return {

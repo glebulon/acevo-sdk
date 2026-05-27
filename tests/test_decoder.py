@@ -2,7 +2,6 @@ from pathlib import Path
 
 from acevo import decode_graphics, decode_static
 
-
 FIXTURES = Path(__file__).parent / "fixtures"
 
 

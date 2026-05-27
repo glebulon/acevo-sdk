@@ -11,13 +11,15 @@ import json
 import os
 import sys
 import time
+import traceback
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-
-from .shared_session import SharedSessionManager
-from ._logging import log_debug, log_info, log_warning, log_error, log_exception, Component
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable, Tuple, TextIO
+from typing import Any, TextIO
+
+from ._logging import Component, log_debug, log_error, log_exception, log_info, log_warning
+from .shared_session import SharedSessionManager
 
 # Windows-specific imports for safe shared memory access
 if sys.platform == "win32":
@@ -74,12 +76,12 @@ class FrameData:
     """
     timestamp: str
     frame_number: int
-    physics: Dict[str, Any]
-    physics_raw: Optional[str] = None
-    graphics: Dict[str, Any] = field(default_factory=dict)
-    graphics_raw: Optional[str] = None
-    static: Dict[str, Any] = field(default_factory=dict)
-    static_raw: Optional[str] = None
+    physics: dict[str, Any]
+    physics_raw: str | None = None
+    graphics: dict[str, Any] = field(default_factory=dict)
+    graphics_raw: str | None = None
+    static: dict[str, Any] = field(default_factory=dict)
+    static_raw: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -90,9 +92,9 @@ class CaptureMetadata:
     """Metadata about the capture session."""
     captured_at: str
     hz: float
-    regions_found: List[str]
-    region_names: Dict[str, str]
-    region_sizes: Dict[str, int]
+    regions_found: list[str]
+    region_names: dict[str, str]
+    region_sizes: dict[str, int]
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -101,7 +103,7 @@ class CaptureMetadata:
 class RegionReader:
     """Reads a single shared memory region."""
 
-    def __init__(self, name: str, size: int, diag_file: Optional[TextIO] = None):
+    def __init__(self, name: str, size: int, diag_file: TextIO | None = None):
         self.name = name
         self.size = size
         self._handle = None
@@ -116,7 +118,7 @@ class RegionReader:
             try:
                 self._diag_file.write(f"{datetime.now().isoformat()} {msg}\n")
                 self._diag_file.flush()
-            except (OSError, IOError):
+            except OSError:
                 # Expected: file closed during shutdown
                 pass
 
@@ -224,10 +226,10 @@ class TelemetryCapture:
     def __init__(
         self,
         hz: float = 20.0,
-        output_dir: Optional[str] = None,
+        output_dir: str | None = None,
         debug_logs: bool = False,
-        session_manager: Optional[SharedSessionManager] = None,
-        game_running_callback: Optional[Callable[[], bool]] = None,
+        session_manager: SharedSessionManager | None = None,
+        game_running_callback: Callable[[], bool] | None = None,
     ):
         # ``debug_logs`` gates three on-disk artefacts that are only useful
         # for reverse-engineering / capture-loop debugging:
@@ -239,23 +241,23 @@ class TelemetryCapture:
         # multi-MB files every session.
         self._debug_logs = debug_logs
         self._hz = hz
-        self._frames: List[FrameData] = []
+        self._frames: list[FrameData] = []
         self._running = False
-        self._task: Optional[asyncio.Task] = None
-        self._readers: Dict[str, RegionReader] = {}
+        self._task: asyncio.Task | None = None
+        self._readers: dict[str, RegionReader] = {}
         self._interval = 1.0 / max(hz, 1.0)
-        self._metadata: Optional[CaptureMetadata] = None
-        self._session_start_time: Optional[datetime] = None
-        self._region_paths: Dict[str, str] = {}
-        self._last_valid_frame_time: Optional[float] = None
-        self._stop_reason: Optional[str] = None
-        self._on_stop_callback: Optional[Callable[[str], None]] = None
+        self._metadata: CaptureMetadata | None = None
+        self._session_start_time: datetime | None = None
+        self._region_paths: dict[str, str] = {}
+        self._last_valid_frame_time: float | None = None
+        self._stop_reason: str | None = None
+        self._on_stop_callback: Callable[[str], None] | None = None
         self._output_dir = output_dir or get_default_output_dir()
-        self._all_disconnected_since: Optional[float] = None
-        self._output_prefix: Optional[str] = None
-        self._idle_since: Optional[float] = None
-        self._lap_boundaries: List[Tuple[int, Optional[float], Optional[int]]] = []  # (frame_idx, lap_time_ms, lap_number)
-        self._diag_file: Optional[TextIO] = None
+        self._all_disconnected_since: float | None = None
+        self._output_prefix: str | None = None
+        self._idle_since: float | None = None
+        self._lap_boundaries: list[tuple[int, float | None, int | None]] = []  # (frame_idx, lap_time_ms, lap_number)
+        self._diag_file: TextIO | None = None
         self._session_manager = session_manager or SharedSessionManager()
         self._game_running_callback = game_running_callback
 
@@ -263,15 +265,15 @@ class TelemetryCapture:
         """Check if currently capturing."""
         return self._running
 
-    def get_stop_reason(self) -> Optional[str]:
+    def get_stop_reason(self) -> str | None:
         """Get the reason why capture stopped (None if still running)."""
         return self._stop_reason
 
-    def get_output_prefix(self) -> Optional[str]:
+    def get_output_prefix(self) -> str | None:
         """Get the current session output prefix."""
         return self._output_prefix
 
-    def set_on_stop_callback(self, callback: Optional[Callable[[str], None]]):
+    def set_on_stop_callback(self, callback: Callable[[str], None] | None):
         """Set callback to be called when capture stops.
 
         Args:
@@ -285,8 +287,8 @@ class TelemetryCapture:
 
     def record_lap_boundary(
         self,
-        lap_time_ms: Optional[float] = None,
-        lap_number: Optional[int] = None,
+        lap_time_ms: float | None = None,
+        lap_number: int | None = None,
     ) -> None:
         """Record the current frame index as a lap boundary.
 
@@ -305,7 +307,7 @@ class TelemetryCapture:
         log_info(Component.TELEMETRY, "Lap boundary recorded",
                  frame=frame_idx, lap_time_ms=lap_time_ms, lap_number=lap_number)
 
-    def get_lap_boundaries(self) -> List[Tuple[int, Optional[float], Optional[int]]]:
+    def get_lap_boundaries(self) -> list[tuple[int, float | None, int | None]]:
         """Return game-reported lap boundaries (frame_idx, lap_time_ms, lap_number)."""
         return self._lap_boundaries.copy()
 
@@ -341,7 +343,7 @@ class TelemetryCapture:
             log_exception(Component.TELEMETRY, "Error saving raw dump", e)
             return False
 
-    def _build_compat_meta_record(self) -> Dict[str, Any]:
+    def _build_compat_meta_record(self) -> dict[str, Any]:
         """Build JSONL metadata matching the standalone capture format."""
         return {
             "_record_type": "meta",
@@ -357,7 +359,7 @@ class TelemetryCapture:
             "_payload_type": "decoded_region_data",
         }
 
-    def _build_compat_frame_record(self, frame: FrameData) -> Dict[str, Any]:
+    def _build_compat_frame_record(self, frame: FrameData) -> dict[str, Any]:
         """Build a standalone-script-compatible frame record.
 
         Physics is decoded into a typed dict; graphics and static are
@@ -365,13 +367,13 @@ class TelemetryCapture:
         reverse-engineered offline against the AC Evo struct documentation
         without re-running the game.
         """
-        regions: Dict[str, Any] = {}
+        regions: dict[str, Any] = {}
 
         # ── Physics: decoded payload + truncated raw hex preview
         payload = frame.physics or {}
         if not isinstance(payload, dict):
             payload = {"value": payload}
-        region_payload: Dict[str, Any] = {"size": REGIONS["physics"][1], **payload}
+        region_payload: dict[str, Any] = {"size": REGIONS["physics"][1], **payload}
         if frame.physics_raw:
             region_payload.setdefault("raw_hex_start", frame.physics_raw[:200])
         regions["physics"] = region_payload
@@ -390,7 +392,7 @@ class TelemetryCapture:
             # ``_decoder`` is set by the decoder itself (e.g.
             # ``ac_evo_graphics``); only fall back to ``raw_only`` if
             # nothing decoded the region.
-            region_record: Dict[str, Any] = {
+            region_record: dict[str, Any] = {
                 "size": REGIONS[name][1],
                 "raw_hex": raw_hex,
                 **decoded,
@@ -410,11 +412,11 @@ class TelemetryCapture:
         """Create a stable per-session file prefix."""
         return datetime.now().strftime("%m-%d-%H-%M-%S")
 
-    def get_frames(self) -> List[FrameData]:
+    def get_frames(self) -> list[FrameData]:
         """Get captured frames."""
         return self._frames.copy()
 
-    def get_metadata(self) -> Optional[CaptureMetadata]:
+    def get_metadata(self) -> CaptureMetadata | None:
         """Get capture metadata."""
         return self._metadata
 
@@ -434,7 +436,7 @@ class TelemetryCapture:
             "app_close",
         }
 
-    def _connect_regions(self) -> Dict[str, RegionReader]:
+    def _connect_regions(self) -> dict[str, RegionReader]:
         """Connect to all shared memory regions with single attempt."""
         readers = {}
         for key, (region_name, size) in REGIONS.items():
@@ -449,7 +451,7 @@ class TelemetryCapture:
                 log_debug(Component.TELEMETRY, "Region not found", key=key, region=region_name)
         return readers
 
-    def _reconnect_missing(self, readers: Dict[str, RegionReader]):
+    def _reconnect_missing(self, readers: dict[str, RegionReader]):
         """Try to reconnect to missing regions."""
         for key, (region_name, size) in REGIONS.items():
             if key in readers:
@@ -460,9 +462,9 @@ class TelemetryCapture:
                 self._region_paths[key] = reader._path_used or ""
                 log_debug(Component.TELEMETRY, "Reconnected to region", key=key, region=region_name)
 
-    def _capture_frame(self, frame_num: int) -> Optional[FrameData]:
+    def _capture_frame(self, frame_num: int) -> FrameData | None:
         """Capture a single frame from shared memory."""
-        from .decoder import decode_physics, decode_graphics, decode_static
+        from .decoder import decode_graphics, decode_physics, decode_static
 
         frame = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -775,7 +777,7 @@ class TelemetryCapture:
             except Exception as e:
                 log_error(Component.TELEMETRY, "Error in stop callback", error=str(e))
 
-    async def stop_capture(self, reason: str = "manual") -> List[FrameData]:
+    async def stop_capture(self, reason: str = "manual") -> list[FrameData]:
         """Stop capturing and return captured frames.
 
         Args:
