@@ -17,3 +17,5 @@ env/
 
 .env
 .DS_Store
+
+.windsurf/
