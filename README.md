@@ -21,10 +21,10 @@ python -m pip install -e ".[dev]"
 ## What It Includes
 
 - ACE log parsing for sessions, laps, sectors, validity, player identity, car, track, tyre compound, setup notes, and fuel signals.
-- Live shared-memory capture for ACE physics, graphics, and static regions on Windows.
-- Decoders for captured shared-memory bytes.
-- Reusable dataclasses for laps, sessions, stints, frames, capture metadata, and shared session state.
-- Track catalog helpers and bundled track catalog data.
+- Live shared-memory capture for ACE physics, graphics, and static regions on Windows, including a validity-only mode that streams lap-completion signals without retaining frames.
+- Decoders for captured shared-memory bytes, plus a lightweight `peek_graphics_validity` for real-time lap validity.
+- Reusable dataclasses for laps, sessions, stints, frames, capture metadata, and shared session state that reconciles log and shared-memory signals.
+- Track and car tuning catalog helpers with bundled data.
 
 ## What It Does Not Include
 
@@ -45,7 +45,7 @@ Those belong in downstream applications for now.
 - Build coaching tools that consume lap, sector, car, track, fuel, tyre, and telemetry signals, while keeping AI/report generation in the downstream app.
 - Create personal data pipelines that export ACE session data to JSONL, SQLite, DuckDB, Parquet, spreadsheets, or analytics services.
 - Build test fixtures and validation tools for ACE telemetry integrations without each project reimplementing log parsing and binary decoding.
-- Prototype future setup/tuning tools on top of stable decoded telemetry and catalog APIs.
+- Prototype setup/tuning tools on top of stable decoded telemetry and the car tuning catalog.
 
 ## Parse Logs
 
