@@ -110,3 +110,18 @@ intentional SDK adaptations listed under "Notes / decisions".
 - Car tuning catalog ported as data+helpers only; upstream
   `scripts/update_catalog.py`/`validate_catalog.py` not ported (release tooling).
 - Lint: `ruff check .` clean; `pytest`: 651 passed.
+
+## Post-sync fix: coarse monotonic clocks (Windows CI py3.10-3.12)
+
+- `LapCompletionData.observed_at` = `time.monotonic()`, which on Windows
+  Python <3.13 uses `GetTickCount64` (~15.6 ms ticks). Two completions in the
+  same tick shared `observed_at`, so `consumed_lap_completion_times` (a set
+  keyed on it) and the parser's `> observed_at` cursor collapsed them,
+  silently dropping the second lap.
+- Fix in `SharedSessionManager.update_from_graphics_shm`: nudge `observed_at`
+  to `last + 1e-6` when monotonic doesn't advance, keeping it strictly
+  increasing per queue. Verified under a simulated frozen clock; 651 tests
+  pass. **The identical bug exists in sim-laps-client — same patch should
+  land there to keep the files in sync.**
+- CI note (warnings only): `actions/checkout@v4`/`actions/setup-python@v5`
+  Node 20 deprecation; `ubuntu-latest` migrating to Ubuntu 26 (Oct 2026).

@@ -823,6 +823,17 @@ class SharedSessionManager:
             ):
                 now_mono = time.monotonic()
                 if not duplicate_counter_echo:
+                    # Consumption dedup and the parser's observation cursor key
+                    # on observed_at. On coarse-resolution clocks (Windows
+                    # Python <3.13: ~15.6 ms ticks) two completions can land in
+                    # the same tick, so nudge the later one forward to keep
+                    # observed_at strictly increasing within the queue.
+                    last_observed = (
+                        self._session_data.lap_completions[-1].observed_at
+                        if self._session_data.lap_completions
+                        else float("-inf")
+                    )
+                    observed_at = now_mono if now_mono > last_observed else last_observed + 1e-6
                     completion = LapCompletionData(
                         completed_laps=max(
                             completed_laps,
@@ -832,7 +843,7 @@ class SharedSessionManager:
                         lap_time_ms=last_laptime_ms,
                         is_valid=self._session_data.active_lap_is_valid,
                         timestamp=datetime.now(timezone.utc).isoformat(),
-                        observed_at=now_mono,
+                        observed_at=observed_at,
                     )
                     self._session_data.latest_lap_completion = completion
                     self._session_data.lap_completions.append(completion)
