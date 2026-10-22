@@ -118,10 +118,15 @@ intentional SDK adaptations listed under "Notes / decisions".
   same tick shared `observed_at`, so `consumed_lap_completion_times` (a set
   keyed on it) and the parser's `> observed_at` cursor collapsed them,
   silently dropping the second lap.
-- Fix in `SharedSessionManager.update_from_graphics_shm`: nudge `observed_at`
-  to `last + 1e-6` when monotonic doesn't advance, keeping it strictly
-  increasing per queue. Verified under a simulated frozen clock; 651 tests
-  pass. **The identical bug exists in sim-laps-client — same patch should
-  land there to keep the files in sync.**
+- Fix (two parts, applied to both repos):
+  1. `SharedSessionManager.update_from_graphics_shm`: nudge `observed_at`
+     to `last + 1e-6` when monotonic doesn't advance, keeping it strictly
+     increasing per queue.
+  2. `LogParser._take_ready_shm_lap`: clamp the grace-check elapsed time
+     to `>= 0` — a nudged `observed_at` sits ~1us in the future while the
+     tick is frozen, and an unclamped negative diff would defer the
+     completion until the clock next ticks.
+  Verified under a fully simulated frozen clock; 651 tests pass, ruff
+  clean. Same patch applied to sim-laps-client to keep the files in sync.
 - CI note (warnings only): `actions/checkout@v4`/`actions/setup-python@v5`
   Node 20 deprecation; `ubuntu-latest` migrating to Ubuntu 26 (Oct 2026).

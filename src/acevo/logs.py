@@ -2010,7 +2010,10 @@ class LogParser:
         # Consume oldest-first. ACE can delay file-log writes for more than a
         # full lap; keeping only the newest SHM transition swaps or drops laps.
         completion = completions[0]
-        if time.monotonic() - completion.observed_at < self.PENDING_VALIDITY_GRACE_SECONDS:
+        # observed_at can sit a microsecond in the future on coarse clocks
+        # (same-tick completions are nudged to stay strictly increasing);
+        # clamp so the grace check treats it as age zero rather than waiting.
+        if max(0.0, time.monotonic() - completion.observed_at) < self.PENDING_VALIDITY_GRACE_SECONDS:
             return None
 
         # A capture completion can arrive before the log parser has observed
