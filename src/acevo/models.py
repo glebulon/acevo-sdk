@@ -11,23 +11,26 @@ from enum import Enum
 
 # ─── LapState enum ────────────────────────────────────────────────────────────
 
+
 class LapState(str, Enum):
     """Explicit classification of every lap.
 
     Using `str` mixin so values serialise naturally to JSON without extra work.
     """
-    PUSH               = "PUSH"                # Clean timed lap
-    OUTLAP             = "OUTLAP"              # Pit-exit or formation lap
-    INLAP              = "INLAP"               # Return to pits lap
+
+    VALID = "VALID"  # Clean timed lap
+    OUTLAP = "OUTLAP"  # Pit-exit or formation lap
+    INLAP = "INLAP"  # Return to pits lap
     INVALID_TRACK_LIMIT = "INVALID_TRACK_LIMIT"  # tyres out → 4 during lap
-    INVALID_PENALTY    = "INVALID_PENALTY"     # UI penalty notification
-    INVALID_SPLIT      = "INVALID_SPLIT"       # Missing / out-of-order sectors
-    INVALID_SECTORS    = "INVALID_SECTORS"     # S1+S2+S3 ≠ lap_time (desync)
-    INVALID_GAME       = "INVALID_GAME"        # Game's authoritative validity flag = false
-    ABORTED            = "ABORTED"             # Lap in progress when session ends
+    INVALID_PENALTY = "INVALID_PENALTY"  # UI penalty notification
+    INVALID_SPLIT = "INVALID_SPLIT"  # Missing / out-of-order sectors
+    INVALID_SECTORS = "INVALID_SECTORS"  # S1+S2+S3 ≠ lap_time (desync)
+    INVALID_GAME = "INVALID_GAME"  # Game's authoritative validity flag = false
+    ABORTED = "ABORTED"  # Lap in progress when session ends
 
 
 # ─── In-progress lap accumulator ─────────────────────────────────────────────
+
 
 @dataclass
 class InProgressLap:
@@ -36,14 +39,8 @@ class InProgressLap:
     # Sector times: key = split index (0..N), value = ms
     splits: dict[int, int] = field(default_factory=dict)
 
-    # Validity flags — each independently marks the lap invalid
-    has_track_limit_violation: bool = False
-    has_unexpected_split: bool = False
+    # Outlap classification (structural, not validity)
     is_outlap: bool = False
-    has_penalty: bool = False
-
-    # Set by 'On Split end with all splits' — all sectors captured
-    split_end_confirmed: bool = False
 
     # Energy-source event (fires once, just before New lap)
     fuel_used: float | None = None
@@ -60,6 +57,7 @@ class InProgressLap:
 
 
 # ─── Stint data ───────────────────────────────────────────────────────────────
+
 
 @dataclass
 class StintData:
@@ -104,12 +102,13 @@ class StintData:
 
 # ─── LapData ─────────────────────────────────────────────────────────────────
 
+
 @dataclass
 class LapData:
     """An immutable snapshot of one completed (or aborted) lap."""
 
-    lap_number: int                        # 1-indexed within session
-    physics_lap_number: int | None      # from evOnLapCompleted N; ground truth
+    lap_number: int  # 1-indexed within session
+    physics_lap_number: int | None  # from evOnLapCompleted N; ground truth
     lap_time_ms: int
     lap_time_str: str
 
@@ -118,9 +117,10 @@ class LapData:
     sector3_ms: int | None = None
     sectors_consistent: bool | None = None  # |S1+S2+S3 − lap_time| ≤ 50 ms
 
-    lap_state: LapState = field(default_factory=lambda: LapState.PUSH)
-    lap_type: str = "PUSH"               # String alias of lap_state.value (compat)
+    lap_state: LapState = field(default_factory=lambda: LapState.VALID)
+    lap_type: str = "VALID"  # String alias of lap_state.value (compat)
     is_valid: bool = True
+    validity_source: str = "heuristic"  # heuristic, shm_graphics, or authoritative (Relevant onSplit)
 
     fuel_used: float | None = None
     fuel_reliable: bool = True
@@ -130,6 +130,9 @@ class LapData:
 
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     distance_hundredm: int | None = None
+    # Stable identity shared by the initial completion callback and any late
+    # parser enrichment. Lap numbers are display data and may be corrected.
+    result_id: str = field(default_factory=lambda: uuid.uuid4().hex)
 
     def to_dict(self) -> dict:
         return {
@@ -144,16 +147,19 @@ class LapData:
             "lap_state": self.lap_state.value,
             "lap_type": self.lap_type,
             "is_valid": self.is_valid,
+            "validity_source": self.validity_source,
             "fuel_used": self.fuel_used,
             "fuel_reliable": self.fuel_reliable,
             "tyre_compound": self.tyre_compound,
             "stint_number": self.stint_number,
             "timestamp": self.timestamp,
             "distance_hundredm": self.distance_hundredm,
+            "result_id": self.result_id,
         }
 
 
 # ─── SessionData ─────────────────────────────────────────────────────────────
+
 
 @dataclass
 class SessionData:
@@ -168,7 +174,7 @@ class SessionData:
     player_name: str | None = None
     player_id: str | None = None
     car_uuid: str | None = None
-    tyre_compound: str = "Unknown"     # Compound at session end
+    tyre_compound: str = "Unknown"  # Compound at session end
     initial_fuel: float = 0.0
     fuel_used_session: float = 0.0
     fuel_reliable: bool = True
@@ -181,12 +187,12 @@ class SessionData:
 
     @property
     def valid_laps(self) -> list[LapData]:
-        return [lap for lap in self.laps if lap.is_valid]
+        return [l for l in self.laps if l.is_valid]  # noqa: E741
 
     @property
     def best_lap(self) -> LapData | None:
         valid = self.valid_laps
-        return min(valid, key=lambda lap: lap.lap_time_ms) if valid else None
+        return min(valid, key=lambda l: l.lap_time_ms) if valid else None  # noqa: E741
 
     def to_dict(self) -> dict:
         return {

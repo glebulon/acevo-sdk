@@ -4,6 +4,7 @@ ACE Log Parser Context
 Persistent parsing context that survives across session boundaries.
 """
 
+
 from .tyre_state import TyreState
 
 
@@ -31,9 +32,6 @@ class LogContext:
         # Cumulative hundredmeters counter; delta gives per-lap distance.
         self.prev_hundredmeters: int = 0
 
-        # How many fuel spikes occurred this session (for hybrid detection).
-        self.fuel_spike_count: int = 0
-
         # car_uuid → {player_name, player_id} from 'connecting gamecar' lines
         self.car_meta: dict[str, dict] = {}
 
@@ -46,7 +44,6 @@ class LogContext:
         self.tyre.reset()
         self.fuel_init_correction = 0.0
         self.prev_hundredmeters = 0
-        self.fuel_spike_count = 0
         self.player_car_uuids.clear()
         self.setup_values.clear()
         if self.car_uuid:

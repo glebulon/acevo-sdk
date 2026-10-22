@@ -20,32 +20,38 @@ TRACK_LIMIT_INVALIDATION_THRESHOLD_M: float = 2.0
 # indicates sector/lap desync corruption.
 SECTOR_SUM_TOLERANCE_MS: int = 50
 
-# Per-lap fuel above this threshold is a hybrid/ERS spike.
-HYBRID_FUEL_THRESHOLD_L: float = 10.0
-
-# How many per-lap spikes before we poison the whole session's reliability flag.
-HYBRID_SPIKE_SESSION_THRESHOLD: int = 2
+# Log and graphics-SHM lap timers are independently rounded to milliseconds.
+# A tiny tolerance reconciles that representation drift without allowing a
+# genuinely different lap to consume the completion.
+LAP_TIME_RECONCILIATION_TOLERANCE_MS: int = 2
 
 # Minimum reasonable lap distance in hundredmeters to flag a lap as aborted.
 # Spa-GP is ~69. Setting low because track length varies; callers can filter.
 MIN_FULL_LAP_HUNDREDM: int = 20
 
-# Car models with broken ERS/PHEV fuel accounting.
-KNOWN_HYBRID_CARS: frozenset[str] = frozenset({
-    "ks_ferrari_296_gtb",
-    "ks_ferrari_sf90_stradale",
-    "ks_mclaren_artura",
-})
+
+def is_hybrid_car(
+    has_ers_from_shm: bool | None = None,
+    has_kers_from_shm: bool | None = None,
+) -> bool:
+    """Determine whether the current car is a hybrid electric vehicle.
+
+    Uses SHM flags (``has_ers`` / ``has_kers``) decoded from the game's
+    graphics shared memory at runtime.  When SHM is not yet connected,
+    returns ``False`` (fuel is assumed reliable until SHM says otherwise).
+    """
+    return bool(has_ers_from_shm or has_kers_from_shm)
+
 
 # Raw GameModeType → normalised session label.
 SESSION_TYPE_MAP: dict[str, str] = {
     "INSTANT_RACE": "RACE",
-    "RACE":         "RACE",
-    "PRACTICE":     "PRACTICE",
-    "TIME_ATTACK":  "TIME_ATTACK",
-    "QUALIFYING":   "QUALIFYING",
-    "HOTLAP":       "HOTLAP",
-    "DRIFT":        "DRIFT",
+    "RACE": "RACE",
+    "PRACTICE": "PRACTICE",
+    "TIME_ATTACK": "TIME_ATTACK",
+    "QUALIFYING": "QUALIFYING",
+    "HOTLAP": "HOTLAP",
+    "DRIFT": "DRIFT",
 }
 
 # Modes that use the player-only "On Split start" sector format.

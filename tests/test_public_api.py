@@ -16,7 +16,7 @@ from acevo import (
 
 
 def test_public_api_imports() -> None:
-    assert __version__ == "0.1.0"
+    assert __version__ == "0.2.0"
     assert LogParser is not None
     assert TelemetryCapture is not None
     assert RegionReader is not None
@@ -27,5 +27,5 @@ def test_public_api_imports() -> None:
     assert decode_static is not None
     assert LapData is not None
     assert SessionData is not None
-    assert LapState.PUSH.value == "PUSH"
+    assert LapState.VALID.value == "VALID"
     assert SharedSessionManager is not None

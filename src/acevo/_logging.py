@@ -12,6 +12,7 @@ class Component(Enum):
 
     LOG_PARSER = "LOG_PARSER"
     TELEMETRY = "TELEMETRY"
+    SHARED_SESSION = "SHARED_SESSION"
 
 
 _logger = logging.getLogger("acevo")

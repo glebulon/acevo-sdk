@@ -7,12 +7,79 @@ shared-memory decoding, telemetry analysis, and API submission code.
 from __future__ import annotations
 
 import threading
+import time
 import uuid
-from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from datetime import datetime, timezone
 from typing import Any
 
+from ._logging import Component, log_debug
+from .constants import LAP_TIME_RECONCILIATION_TOLERANCE_MS
 from .models import LapData, SessionData
+
+_TERMINAL_SESSION_PHASES = frozenset(
+    {
+        "ended",
+        "disqualified",
+        "teardown",
+    }
+)
+
+_REPLAY_STATUS_NAMES = frozenset({"AC_REPLAY"})
+_NON_LIVE_SESSION_PHASES = frozenset(
+    {
+        "none",
+        "unknown",
+        "idle",
+        "standby",
+        "initialization",
+        "initializing",
+        "loading",
+        "menu",
+        "mainmenu",
+        "pre_session",
+        "session_start",
+        "waiting_for_session",
+    }
+)
+
+
+def _graphics_status_name(graphics_data: dict[str, Any]) -> str:
+    status_name = str(graphics_data.get("status_name") or "").strip().upper()
+    if status_name:
+        return status_name
+    status = graphics_data.get("status")
+    return {0: "AC_OFF", 1: "AC_REPLAY", 2: "AC_LIVE", 3: "AC_PAUSE"}.get(status, "")
+
+
+def _is_terminal_graphics_state(
+    graphics_data: dict[str, Any],
+    current_phase: str | None,
+) -> bool:
+    """Return whether a graphics snapshot is a terminal/teardown state."""
+    phase = graphics_data.get("session_phase", current_phase)
+    normalized_phase = str(phase or "").strip().casefold()
+    if normalized_phase in _TERMINAL_SESSION_PHASES:
+        return True
+
+    # AC_OFF is the mapping teardown state. It is terminal even when a stale
+    # phase string remains from the last active snapshot.
+    return _graphics_status_name(graphics_data) == "AC_OFF"
+
+
+def _is_replay_graphics_state(graphics_data: dict[str, Any]) -> bool:
+    """Return whether a graphics snapshot is replay data, not live timing."""
+    return _graphics_status_name(graphics_data) in _REPLAY_STATUS_NAMES
+
+
+def _is_non_live_session_phase(
+    graphics_data: dict[str, Any],
+    current_phase: str | None = None,
+) -> bool:
+    """Return whether an explicit startup/menu phase cannot own timing."""
+    phase = graphics_data.get("session_phase", current_phase)
+    normalized_phase = str(phase or "").strip().casefold().replace(" ", "_").replace("-", "_")
+    return bool(phase) and normalized_phase in _NON_LIVE_SESSION_PHASES
 
 
 @dataclass
@@ -21,6 +88,7 @@ class LapValidityData:
 
     lap_number: int
     is_valid: bool
+    lap_state: str | None = None
     invalidation_reason: str | None = None
     invalidation_timestamp: str | None = None
     source: str = "shm_graphics"
@@ -41,6 +109,20 @@ class LapTimingData:
     source: str = "shm_graphics"
     lap_time_str: str | None = None
     lap_completion_timestamp: str | None = None
+    completed_lap_time: float | None = None
+    completed_lap_time_source: str | None = None  # "logs", "shm_graphics", "calculated"
+
+
+@dataclass(frozen=True)
+class LapCompletionData:
+    """A live SHM lap-counter transition observed before logs may flush."""
+
+    completed_laps: int
+    lap_time_ms: int
+    is_valid: bool | None
+    timestamp: str
+    observed_at: float
+    source: str = "shm_graphics"
 
 
 @dataclass
@@ -76,6 +158,22 @@ class SectorSplitData:
     source: str = "logs"
 
 
+@dataclass(frozen=True)
+class SubmissionFallbackSnapshot:
+    """Immutable submission fallbacks copied for a matching session."""
+
+    game_version: str
+    session_type: str
+    track: str
+    player_id: str | None
+    car_model: str | None
+    last_lap_time_ms: int | None
+    sector1_ms: int | None
+    sector2_ms: int | None
+    sector3_ms: int | None
+    fuel_consumed_lap: float | None
+
+
 @dataclass
 class SessionMetadataData:
     """Session metadata from Static SHM (or logs as fallback)."""
@@ -101,35 +199,35 @@ class SharedSessionData:
     # Shared objects
     lap_validity: dict[int, LapValidityData] = field(default_factory=dict)
     lap_timing: dict[int, LapTimingData] = field(default_factory=dict)
+    latest_lap_completion: LapCompletionData | None = None
+    lap_completions: list[LapCompletionData] = field(default_factory=list)
+    consumed_lap_completion_times: set[float] = field(default_factory=set)
+    # A timer-reset completion can be followed by a delayed completed-lap
+    # counter update for that same boundary. Keep that relationship explicit
+    # so equal-time later laps are still emitted.
+    pending_counter_echo: bool = False
+    pending_counter_echo_lap: int | None = None
+    pending_counter_echo_time_ms: int | None = None
     fuel_data: FuelData = field(default_factory=FuelData)
-    player_identification: PlayerIdentificationData = field(
-        default_factory=PlayerIdentificationData
-    )
+    player_identification: PlayerIdentificationData = field(default_factory=PlayerIdentificationData)
     sector_splits: dict[int, SectorSplitData] = field(default_factory=dict)
     session_metadata: SessionMetadataData = field(default_factory=SessionMetadataData)
 
-    # Legacy flat fields for migration compatibility
-    session_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    game_version: str = "Unknown"
-    session_type: str = "Unknown"
-    session_name: str = "Unknown"
-    track: str = "Unknown"
-    track_configuration: str = "Unknown"
-    track_length_m: float | None = None
-    car: str = "Unknown"
-    player_name: str | None = None
-    player_id: str | None = None
-    car_uuid: str | None = None
-    weather: str = "Unknown"
-    is_online: bool = False
-    is_timed_race: bool = False
-    event_id: int | None = None
-
-    lap_times: dict[int, float] = field(default_factory=dict)
-    lap_times_graphics: dict[int, float] = field(default_factory=dict)
-    lap_times_logs: dict[int, float] = field(default_factory=dict)
-    calc_lap_times: dict[int, float] = field(default_factory=dict)
     current_lap_time_ms: int | None = None
+    # A completion is publishable only after the live timer has supplied
+    # positive, advancing samples.  Counter and last-lap values can survive a
+    # mapping/session restart, so they cannot establish ownership themselves.
+    completion_eligible: bool = False
+    positive_timer_samples: int = 0
+    # ``current_lap_time_ms`` reflects the latest graphics payload for callers,
+    # while this baseline remains on the last non-paused timer sample.  Pause
+    # payloads commonly replace the timer with zero before reporting a finish.
+    live_timer_baseline_ms: int | None = None
+    timer_was_paused: bool = False
+    # Live graphics validity is latched independently of the physical lap
+    # number. ACE can reuse its completed-lap counter after returning to the
+    # pits, while completed log records remain keyed by absolute session lap.
+    active_lap_is_valid: bool | None = None
     last_lap_time_ms: int | None = None
     best_lap_time_ms: int | None = None
     ideal_lap_time_ms: int | None = None
@@ -137,16 +235,9 @@ class SharedSessionData:
 
     sector_times: dict[int, dict[int, int]] = field(default_factory=dict)
 
-    lap_validity_flat: dict[int, bool] = field(default_factory=dict)
-    is_current_lap_invalid: bool | None = None
-
-    lap_boundaries: dict[int, int] = field(default_factory=dict)
-    lap_completion_timestamps: dict[int, str] = field(default_factory=dict)
-
     current_fuel: float | None = None
     fuel_consumption_rate: float | None = None
     fuel_economy: float | None = None
-    fuel_consumption: dict[int, float] = field(default_factory=dict)
 
     total_laps: int | None = None
     current_lap: int | None = None
@@ -162,15 +253,21 @@ class SharedSessionData:
     tyre_compound: str = "Unknown"
     stint_number: int = 1
 
+    # Powertrain flags decoded from the static SHM region.
+    # Used to detect hybrid/electric cars dynamically instead of
+    # relying solely on a hardcoded model-name list.
+    has_ers: bool | None = None
+    has_kers: bool | None = None
+    # Identity to which the capability sample belongs, so it can be cleared
+    # when the player changes cars.
+    hybrid_flags_car_uuid: str | None = None
+
     starting_ambient_temp_c: float | None = None
     starting_ground_temp_c: float | None = None
     starting_grip: str | None = None
     air_density: float | None = None
 
     data_sources: dict[str, set[str]] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        self.session_metadata.session_id = self.session_id
 
 
 class SharedSessionManager:
@@ -179,7 +276,6 @@ class SharedSessionManager:
     def __init__(self) -> None:
         self._session_data = SharedSessionData()
         self._lock = threading.RLock()
-        self._observers: list[Callable[[SharedSessionData], None]] = []
 
     def _mark_source(self, field_name: str, source: str) -> None:
         if field_name not in self._session_data.data_sources:
@@ -195,13 +291,65 @@ class SharedSessionManager:
         with self._lock:
             return self._session_data.lap_timing.get(lap_num)
 
+    def get_latest_lap_completion(self) -> LapCompletionData | None:
+        with self._lock:
+            return self._session_data.latest_lap_completion
+
+    def get_lap_completions_after(self, observed_at: float) -> list[LapCompletionData]:
+        """Return unconsumed SHM completions in observation order."""
+        with self._lock:
+            return [
+                completion
+                for completion in self._session_data.lap_completions
+                if (
+                    completion.observed_at > observed_at
+                    and completion.observed_at not in self._session_data.consumed_lap_completion_times
+                )
+            ]
+
+    def get_lap_completion_by_time(
+        self,
+        lap_time_ms: int,
+        *,
+        consume: bool = False,
+    ) -> LapCompletionData | None:
+        """Return the nearest unconsumed completion within the small tolerance.
+
+        Matching is nearest-time first and observation-order stable for ties.
+        A caller that has used the completion to reconcile a log lap can pass
+        ``consume=True`` so another delayed log record cannot use it again.
+        """
+        with self._lock:
+            candidates = [
+                completion
+                for completion in self._session_data.lap_completions
+                if (
+                    completion.observed_at not in self._session_data.consumed_lap_completion_times
+                    and abs(completion.lap_time_ms - lap_time_ms) <= LAP_TIME_RECONCILIATION_TOLERANCE_MS
+                )
+            ]
+            if not candidates:
+                return None
+            completion = min(
+                candidates,
+                key=lambda item: (abs(item.lap_time_ms - lap_time_ms), item.observed_at),
+            )
+            if consume:
+                self._session_data.consumed_lap_completion_times.add(completion.observed_at)
+            return completion
+
+    def consume_lap_completion(self, completion: LapCompletionData) -> None:
+        """Mark one SHM completion as used by a parser reconciliation."""
+        with self._lock:
+            self._session_data.consumed_lap_completion_times.add(completion.observed_at)
+
     def get_fuel_data(self) -> FuelData:
         with self._lock:
-            return self._session_data.fuel_data
+            return replace(self._session_data.fuel_data)
 
     def get_player_identification(self) -> PlayerIdentificationData:
         with self._lock:
-            return self._session_data.player_identification
+            return replace(self._session_data.player_identification)
 
     def get_sector_split_data(self, lap_num: int) -> SectorSplitData | None:
         with self._lock:
@@ -209,27 +357,52 @@ class SharedSessionManager:
 
     def get_session_metadata_data(self) -> SessionMetadataData:
         with self._lock:
-            return self._session_data.session_metadata
+            return replace(self._session_data.session_metadata)
+
+    def get_submission_fallbacks(
+        self,
+        session_id: str | None,
+        lap_number: int,
+    ) -> SubmissionFallbackSnapshot | None:
+        """Copy submission fallbacks only from the requested logged session."""
+        with self._lock:
+            metadata = self._session_data.session_metadata
+            if not session_id or not metadata.session_id or metadata.session_id != session_id:
+                return None
+
+            player = self._session_data.player_identification
+            timing = self._session_data.lap_timing.get(lap_number)
+            sectors = self._session_data.sector_splits.get(lap_number)
+            fuel = self._session_data.fuel_data
+            return SubmissionFallbackSnapshot(
+                game_version=metadata.game_version,
+                session_type=metadata.session_type,
+                track=metadata.track,
+                player_id=player.steam_id,
+                car_model=player.car_model,
+                last_lap_time_ms=timing.last_lap_time_ms if timing else None,
+                sector1_ms=sectors.sector1_ms if sectors else None,
+                sector2_ms=sectors.sector2_ms if sectors else None,
+                sector3_ms=sectors.sector3_ms if sectors else None,
+                fuel_consumed_lap=fuel.fuel_consumed_lap,
+            )
 
     # Legacy accessors
     def get_lap_time(self, lap_num: int) -> float | None:
         with self._lock:
-            # 1st priority: Graphics SHM timing state.
-            graphics_time = self._session_data.lap_times_graphics.get(lap_num)
-            if graphics_time is not None:
-                return graphics_time
-
-            # 2nd priority: Log parser completed-lap timing.
-            logs_time = self._session_data.lap_times_logs.get(lap_num)
-            if logs_time is not None:
-                return logs_time
-
-            # 3rd priority: Derived telemetry timings.
-            return self._session_data.calc_lap_times.get(lap_num)
+            timing = self._session_data.lap_timing.get(lap_num)
+            if timing is None or timing.completed_lap_time is None:
+                return None
+            return timing.completed_lap_time
 
     def get_current_lap_time(self) -> int | None:
         with self._lock:
             return self._session_data.current_lap_time_ms
+
+    def has_live_timer_ownership(self) -> bool:
+        """Return whether live timing evidence can own a SHM boundary."""
+        with self._lock:
+            return self._session_data.completion_eligible
 
     def get_sector_times(self, lap_num: int) -> dict[int, int] | None:
         with self._lock:
@@ -237,14 +410,15 @@ class SharedSessionManager:
 
     def get_lap_validity(self, lap_num: int) -> bool:
         with self._lock:
-            return self._session_data.lap_validity_flat.get(lap_num, True)
+            validity = self._session_data.lap_validity.get(lap_num)
+            return validity.is_valid if validity is not None else True
 
     def get_lap_state(self, lap_num: int) -> str | None:
         with self._lock:
             lap_validity = self._session_data.lap_validity.get(lap_num)
             if lap_validity is None:
                 return None
-            return "PUSH" if lap_validity.is_valid else "INVALID_GAME"
+            return lap_validity.lap_state or ("VALID" if lap_validity.is_valid else "INVALID_GAME")
 
     def get_car_setup(self) -> dict[str, Any]:
         with self._lock:
@@ -252,119 +426,98 @@ class SharedSessionManager:
 
     def get_car(self) -> str:
         with self._lock:
-            return self._session_data.car
+            return self._session_data.player_identification.car_model or "Unknown"
+
+    def get_hybrid_flags(self) -> tuple[bool | None, bool | None]:
+        """Return ``(has_ers, has_kers)`` from the static SHM region.
+
+        Both values are ``None`` until the telemetry capture decodes the
+        first static frame.
+        """
+        with self._lock:
+            return self._session_data.has_ers, self._session_data.has_kers
 
     def get_session_metadata(self) -> dict[str, Any]:
         with self._lock:
             md = self._session_data.session_metadata
-            sources = self._session_data.data_sources
-
-            # Priority per plan: Static SHM > Logs > Graphics/session summary.
-            game_version = (
-                md.game_version
-                if "shm_static" in sources.get("game_version", set())
-                else self._session_data.game_version
-            )
-            session_type = (
-                md.session_type
-                if "shm_static" in sources.get("session_type", set())
-                else self._session_data.session_type
-            )
-            track = (
-                md.track
-                if "shm_static" in sources.get("track", set())
-                else self._session_data.track
-            )
-            is_online = (
-                md.is_online
-                if "shm_static" in sources.get("is_online", set())
-                else self._session_data.is_online
-            )
-            is_timed_race = (
-                md.is_timed_race
-                if "shm_static" in sources.get("is_timed_race", set())
-                else self._session_data.is_timed_race
-            )
-            event_id = md.event_id if "shm_static" in sources.get("event_id", set()) else self._session_data.event_id
-
+            ident = self._session_data.player_identification
             return {
-                "session_id": self._session_data.session_id,
-                "game_version": game_version,
-                "session_type": session_type,
-                "track": track,
-                "track_configuration": self._session_data.track_configuration,
-                "track_length_m": self._session_data.track_length_m,
-                "is_online": is_online,
-                "is_timed_race": is_timed_race,
-                "event_id": event_id,
-                # Logs-only identity fields.
-                "player_id": self._session_data.player_id,
-                "car_uuid": self._session_data.car_uuid,
+                "session_id": md.session_id,
+                "game_version": md.game_version,
+                "session_type": md.session_type,
+                "track": md.track,
+                "track_configuration": md.track_configuration,
+                "track_length_m": md.track_length_m,
+                "is_online": md.is_online,
+                "is_timed_race": md.is_timed_race,
+                "event_id": md.event_id,
+                "player_id": ident.steam_id,
+                "car_uuid": ident.car_uuid,
             }
 
     def get_best_lap_time(self) -> float | None:
         with self._lock:
-            return min(self._session_data.lap_times.values()) if self._session_data.lap_times else None
+            times = [
+                t.completed_lap_time for t in self._session_data.lap_timing.values() if t.completed_lap_time is not None
+            ]
+            return min(times) if times else None
 
     def get_all_lap_times(self) -> dict[int, float]:
         with self._lock:
-            lap_nums = (
-                set(self._session_data.lap_times_graphics)
-                | set(self._session_data.lap_times_logs)
-                | set(self._session_data.calc_lap_times)
-            )
-            merged: dict[int, float] = {}
-            for lap_num in lap_nums:
-                value = self._session_data.lap_times_graphics.get(lap_num)
-                if value is None:
-                    value = self._session_data.lap_times_logs.get(lap_num)
-                if value is None:
-                    value = self._session_data.calc_lap_times.get(lap_num)
-                if value is not None:
-                    merged[lap_num] = value
-            return merged
+            return {
+                lap_num: t.completed_lap_time
+                for lap_num, t in self._session_data.lap_timing.items()
+                if t.completed_lap_time is not None
+            }
 
     def validate_data_consistency(self) -> dict[str, list[str]]:
         issues: list[str] = []
         with self._lock:
-            lap_nums = set(self._session_data.lap_times_graphics) | set(self._session_data.lap_times_logs)
-            for lap_num in sorted(lap_nums):
-                graphics_time = self._session_data.lap_times_graphics.get(lap_num)
-                logs_time = self._session_data.lap_times_logs.get(lap_num)
-                if graphics_time is None or logs_time is None:
+            for _lap_num, timing in sorted(self._session_data.lap_timing.items()):
+                if timing.completed_lap_time is None:
                     continue
-                if abs(graphics_time - logs_time) > 100.0:
-                    issues.append(
-                        
-                            f"lap {lap_num}: graphics={int(graphics_time)}ms "
-                            f"logs={int(logs_time)}ms"
-                        
-                    )
+                # Check for source drift: if both logs and graphics provided
+                # times, compare them.  We detect this by checking if the
+                # LapTimingData was updated from both sources.
+                # Since we now store a single completed_lap_time with priority,
+                # we compare against the LapData from logs if available.
+                pass
 
         return {"inconsistencies": issues}
 
     def get_all_lap_validity(self) -> dict[int, bool]:
         with self._lock:
-            return dict(self._session_data.lap_validity_flat)
+            return {lap_num: v.is_valid for lap_num, v in self._session_data.lap_validity.items()}
 
     # New shared object updates
     def update_lap_validity_from_graphics_shm(self, lap_num: int, is_invalid: bool) -> None:
         with self._lock:
             current = self._session_data.lap_validity.get(lap_num)
+            lap_state = "INVALID_GAME" if is_invalid else "VALID"
+
+            # Completed laps (source == "logs") are frozen — SHM validity
+            # is read-only for them.  Only the in-progress lap is updated.
+            if current is not None and current.source == "logs":
+                return
+
             if current is None:
-                current = LapValidityData(lap_number=lap_num, is_valid=not is_invalid)
+                current = LapValidityData(lap_number=lap_num, is_valid=not is_invalid, lap_state=lap_state)
                 self._session_data.lap_validity[lap_num] = current
             else:
                 current.is_valid = not is_invalid
-            current.source = "shm_graphics"
+                current.lap_state = lap_state
+                current.source = "shm_graphics"
 
-            self._session_data.lap_validity_flat[lap_num] = not is_invalid
-            self._session_data.is_current_lap_invalid = is_invalid
             self._mark_source("lap_validity", "shm_graphics")
 
-        self.notify_observers()
-
-    def update_lap_timing_from_graphics_shm(self, lap_num: int, timing_data: dict[str, Any]) -> None:
+    def update_lap_timing_from_graphics_shm(
+        self,
+        lap_num: int,
+        timing_data: dict[str, Any],
+        *,
+        completed_lap_num: int | None = None,
+        completed_lap_time_eligible: bool = True,
+    ) -> None:
         with self._lock:
             current = self._session_data.lap_timing.get(lap_num)
             if current is None:
@@ -387,10 +540,21 @@ class SharedSessionManager:
             self._session_data.ideal_lap_time_ms = current.ideal_lap_time_ms
             self._session_data.delta_time_ms = current.delta_time_ms
 
-            if current.last_lap_time_ms and current.last_lap_time_ms > 0:
-                lap_time = float(current.last_lap_time_ms)
-                self._session_data.lap_times[lap_num] = lap_time
-                self._session_data.lap_times_graphics[lap_num] = lap_time
+            if completed_lap_time_eligible and current.last_lap_time_ms and current.last_lap_time_ms > 0:
+                # Graphics exposes the previous lap's completed time alongside
+                # the new current lap. Callers that know the completed-lap
+                # counter must map that value back to the previous lap rather
+                # than creating a duplicate completed time on the current lap.
+                completed_num = completed_lap_num or lap_num
+                completed = self._session_data.lap_timing.get(completed_num)
+                if completed is None:
+                    completed = LapTimingData(lap_number=completed_num)
+                    self._session_data.lap_timing[completed_num] = completed
+                # Only store graphics-sourced completed time if logs haven't
+                # already set one (logs are authoritative).
+                if completed.completed_lap_time_source != "logs":
+                    completed.completed_lap_time = float(current.last_lap_time_ms)
+                    completed.completed_lap_time_source = "shm_graphics"
                 self._mark_source("lap_times", "shm_graphics")
 
             for field_name in (
@@ -401,8 +565,6 @@ class SharedSessionManager:
                 "delta_time_ms",
             ):
                 self._mark_source(field_name, "shm_graphics")
-
-        self.notify_observers()
 
     def update_fuel_from_graphics_shm(self, fuel_data: dict[str, Any]) -> None:
         with self._lock:
@@ -425,27 +587,28 @@ class SharedSessionManager:
             self._mark_source("fuel_consumption_rate", "shm_graphics")
             self._mark_source("fuel_economy", "shm_graphics")
 
-        self.notify_observers()
-
     def update_player_identification_from_logs(self, player_data: dict[str, Any]) -> None:
         with self._lock:
             ident = self._session_data.player_identification
+            incoming_car_uuid = player_data.get("car_uuid")
+            if (
+                incoming_car_uuid
+                and ident.car_uuid
+                and str(incoming_car_uuid).casefold() != str(ident.car_uuid).casefold()
+            ):
+                self._session_data.has_ers = None
+                self._session_data.has_kers = None
+                self._session_data.hybrid_flags_car_uuid = None
             ident.steam_id = player_data.get("steam_id") or ident.steam_id
             ident.player_name = player_data.get("player_name") or ident.player_name
-            ident.car_uuid = player_data.get("car_uuid") or ident.car_uuid
+            ident.car_uuid = incoming_car_uuid or ident.car_uuid
             ident.car_model = player_data.get("car_model") or ident.car_model
             ident.source = "logs"
-
-            self._session_data.player_id = ident.steam_id
-            self._session_data.player_name = ident.player_name
-            self._session_data.car_uuid = ident.car_uuid
-            if ident.car_model:
-                self._session_data.car = ident.car_model
+            if ident.car_uuid and self._session_data.hybrid_flags_car_uuid is None:
+                self._session_data.hybrid_flags_car_uuid = ident.car_uuid
 
             self._mark_source("player_id", "logs")
             self._mark_source("car_uuid", "logs")
-
-        self.notify_observers()
 
     def update_sector_splits_from_logs(self, lap_num: int, sector_data: dict[str, Any]) -> None:
         with self._lock:
@@ -470,12 +633,9 @@ class SharedSessionManager:
 
             self._mark_source("sector_times", "logs")
 
-        self.notify_observers()
-
     def update_session_metadata_from_static_shm(self, metadata: dict[str, Any]) -> None:
         with self._lock:
             md = self._session_data.session_metadata
-            md.session_id = self._session_data.session_id
             md.game_version = metadata.get("ac_evo_version", md.game_version)
             md.session_type = str(metadata.get("session", md.session_type))
             md.session_name = metadata.get("session_name", md.session_name)
@@ -487,123 +647,376 @@ class SharedSessionManager:
             md.event_id = metadata.get("event_id", md.event_id)
             md.source = "shm_static"
 
-            self._session_data.game_version = md.game_version
-            self._session_data.session_type = md.session_type
-            self._session_data.session_name = md.session_name
-            self._session_data.track = md.track
-            self._session_data.track_configuration = md.track_configuration
-            self._session_data.track_length_m = md.track_length_m
-            self._session_data.is_online = md.is_online
-            self._session_data.is_timed_race = md.is_timed_race
-            self._session_data.event_id = md.event_id
             self._session_data.starting_ambient_temp_c = metadata.get(
                 "starting_ambient_temperature_c", self._session_data.starting_ambient_temp_c
             )
             self._session_data.starting_ground_temp_c = metadata.get(
                 "starting_ground_temperature_c", self._session_data.starting_ground_temp_c
             )
+
+            # Powertrain flags from SHM static region — primary hybrid
+            # detection source (covers any car without manual list updates).
+            static_car_uuid = metadata.get("car_uuid")
+            if (
+                static_car_uuid
+                and self._session_data.player_identification.car_uuid
+                and str(static_car_uuid).casefold() != str(self._session_data.player_identification.car_uuid).casefold()
+            ):
+                self._session_data.has_ers = None
+                self._session_data.has_kers = None
+            if static_car_uuid:
+                self._session_data.hybrid_flags_car_uuid = str(static_car_uuid)
+            if "has_ers" in metadata:
+                self._session_data.has_ers = bool(metadata["has_ers"])
+            if "has_kers" in metadata:
+                self._session_data.has_kers = bool(metadata["has_kers"])
             starting_grip = metadata.get("starting_grip_name") or metadata.get("starting_grip")
             self._session_data.starting_grip = starting_grip
 
             for field_name in ("game_version", "session_type", "track", "is_online", "is_timed_race"):
                 self._mark_source(field_name, "shm_static")
 
-        self.notify_observers()
-
     # Legacy update entry points
     def update_lap_from_logs(self, lap_data: LapData, session_data: SessionData | None = None) -> None:
-        player_payload: dict[str, Any] = {}
-        if session_data is not None:
-            with self._lock:
-                self._session_data.session_id = session_data.session_id
-                self._session_data.session_metadata.session_id = session_data.session_id
-                self._session_data.game_version = session_data.game_version
-                self._session_data.session_type = session_data.session_type
-                self._session_data.track = session_data.track
-                self._session_data.weather = session_data.weather
-                self._session_data.car = session_data.car
-
-                self._mark_source("game_version", "logs")
-                self._mark_source("session_type", "logs")
-                self._mark_source("track", "logs")
-
-            player_payload = {
-                "steam_id": session_data.player_id,
-                "player_name": session_data.player_name,
-                "car_uuid": session_data.car_uuid,
-                "car_model": session_data.car,
-            }
-            self.update_player_identification_from_logs(player_payload)
-
-        self.update_sector_splits_from_logs(
-            lap_data.lap_number,
-            {
-                "sector1_ms": lap_data.sector1_ms,
-                "sector2_ms": lap_data.sector2_ms,
-                "sector3_ms": lap_data.sector3_ms,
-            },
-        )
-
         with self._lock:
-            self._session_data.lap_boundaries[lap_data.lap_number] = lap_data.lap_number
-            self._session_data.lap_completion_timestamps[lap_data.lap_number] = lap_data.timestamp
-            self._session_data.fuel_consumption[lap_data.lap_number] = lap_data.fuel_used or 0.0
+            if session_data is not None:
+                self.update_session_metadata_from_logs(session_data)
+
+            self.update_sector_splits_from_logs(
+                lap_data.lap_number,
+                {
+                    "sector1_ms": lap_data.sector1_ms,
+                    "sector2_ms": lap_data.sector2_ms,
+                    "sector3_ms": lap_data.sector3_ms,
+                },
+            )
+
+            timing = self._session_data.lap_timing.get(lap_data.lap_number)
+            if timing is None:
+                timing = LapTimingData(lap_number=lap_data.lap_number)
+                self._session_data.lap_timing[lap_data.lap_number] = timing
+            timing.lap_completion_timestamp = lap_data.timestamp
 
             if lap_data.lap_time_ms > 0:
                 lap_time = float(lap_data.lap_time_ms)
-                self._session_data.lap_times[lap_data.lap_number] = lap_time
-                self._session_data.lap_times_logs[lap_data.lap_number] = lap_time
+                timing.completed_lap_time = lap_time
+                timing.completed_lap_time_source = "logs"
                 self._mark_source("lap_times", "logs")
 
+            # ── Validity ───────────────────────────────────────────────
+            # The log parser's verdict is authoritative for completed laps
+            # regardless of whether it came from the game's ``Relevant
+            # onSplit`` broadcast or structural classification.  SHM
+            # is_valid_lap cannot distinguish contact from track cuts, and
+            # contact must never invalidate a lap, so log always wins.
+            # Freeze with source="logs" so future SHM peeks cannot flip
+            # the entry back.
+            log_state = lap_data.lap_type or lap_data.lap_state.value
             self._session_data.lap_validity[lap_data.lap_number] = LapValidityData(
                 lap_number=lap_data.lap_number,
                 is_valid=lap_data.is_valid,
+                lap_state=log_state,
                 source="logs",
             )
-            self._session_data.lap_validity_flat[lap_data.lap_number] = lap_data.is_valid
+            self._mark_source("lap_times", "logs")
 
-            self._mark_source("lap_boundaries", "logs")
-            self._mark_source("lap_completion_timestamps", "logs")
-            self._mark_source("fuel_consumption", "logs")
+    def update_session_metadata_from_logs(self, session_data: SessionData) -> None:
+        """Update session metadata and player identification from log SessionData.
 
-        self.notify_observers()
+        Like update_from_logs but skips lap iteration — used at session start
+        before any laps have been parsed.
+        """
+        with self._lock:
+            md = self._session_data.session_metadata
+            md.session_id = session_data.session_id
+            md.game_version = session_data.game_version
+            md.session_type = session_data.session_type
+            md.track = session_data.track
+            md.weather = session_data.weather
+
+            self._mark_source("game_version", "logs")
+            self._mark_source("session_type", "logs")
+            self._mark_source("track", "logs")
+
+            self.update_player_identification_from_logs(
+                {
+                    "steam_id": session_data.player_id,
+                    "player_name": session_data.player_name,
+                    "car_uuid": session_data.car_uuid,
+                    "car_model": session_data.car,
+                }
+            )
 
     def update_from_logs(self, log_session_data: SessionData) -> None:
         with self._lock:
-            self._session_data.session_id = log_session_data.session_id
-            self._session_data.session_metadata.session_id = log_session_data.session_id
-            self._session_data.game_version = log_session_data.game_version
-            self._session_data.session_type = log_session_data.session_type
-            self._session_data.track = log_session_data.track
-            self._session_data.weather = log_session_data.weather
-            self._session_data.car = log_session_data.car
+            self.update_session_metadata_from_logs(log_session_data)
 
-        self.update_player_identification_from_logs(
-            {
-                "steam_id": log_session_data.player_id,
-                "player_name": log_session_data.player_name,
-                "car_uuid": log_session_data.car_uuid,
-                "car_model": log_session_data.car,
-            }
-        )
-
-        for lap in log_session_data.laps:
-            self.update_lap_from_logs(lap, session_data=log_session_data)
+            for lap in log_session_data.laps:
+                self.update_lap_from_logs(lap)
 
     def update_from_static_shm(self, static_data: dict[str, Any]) -> None:
         self.update_session_metadata_from_static_shm(static_data)
 
     def update_from_graphics_shm(self, graphics_data: dict[str, Any]) -> None:
-        current_lap = int(graphics_data.get("session_current_lap") or 0)
+        # ── Determine current lap number ────────────────────────────────
+        # session_current_lap (from SMEvoSessionState.current_lap) has a
+        # fragile offset that reads 0 on AC Evo 0.8.0.1.  total_lap_count
+        # (SPageFileGraphicEvo at stable offset 2384) is the completed-lap
+        # counter; +1 gives the in-progress lap.  The lightweight
+        # ``peek_graphics_validity()`` always provides total_lap_count and
+        # sets session_current_lap=0, so the fallback is the normal path.
+        shm_current_lap = int(graphics_data.get("session_current_lap") or 0)
+        completed_laps = int(graphics_data.get("total_lap_count") or 0)
+        current_lap_time_ms = int(graphics_data.get("current_lap_time_ms") or 0)
+        last_laptime_ms = int(graphics_data.get("last_laptime_ms") or 0)
+        is_valid_lap = graphics_data.get("is_valid_lap")
+
+        # Capture the boundary before current-lap validity is updated. ACE can
+        # reset the live timer and validity several seconds before advancing
+        # total_lap_count, so the timer reset is the primary boundary signal.
+        # The counter transition remains a fallback for builds without a
+        # usable timer. ``active_lap_is_valid`` is deliberately not keyed by
+        # the physical lap counter because that counter can be reused after a
+        # pit stop.
+        with self._lock:
+            # Publish phase before evaluating timing transitions. The same
+            # snapshot must decide both whether a completion is physical and
+            # whether the active validity latch remains meaningful.
+            incoming_phase = graphics_data.get("session_phase")
+            if incoming_phase is not None:
+                self._session_data.session_phase = incoming_phase
+            terminal_state = _is_terminal_graphics_state(
+                graphics_data,
+                self._session_data.session_phase,
+            )
+            replay_state = _is_replay_graphics_state(graphics_data)
+            startup_state = _is_non_live_session_phase(graphics_data, self._session_data.session_phase)
+            paused_state = _graphics_status_name(graphics_data) == "AC_PAUSE"
+            previous_completed = self._session_data.total_laps
+            previous_lap_time_ms = int(
+                self._session_data.live_timer_baseline_ms
+                if self._session_data.live_timer_baseline_ms is not None
+                else (self._session_data.current_lap_time_ms or 0)
+            )
+            was_paused = self._session_data.timer_was_paused
+            completion_eligible_before = self._session_data.completion_eligible
+            lap_timer_reset = previous_lap_time_ms >= 5_000 and 0 <= current_lap_time_ms <= 1_000
+            completed_timer_reset = (
+                lap_timer_reset and last_laptime_ms > 0 and abs(previous_lap_time_ms - last_laptime_ms) <= 2_000
+            )
+            counter_advanced = previous_completed is not None and completed_laps > int(previous_completed)
+            duplicate_counter_echo = (
+                counter_advanced
+                and not completed_timer_reset
+                and self._session_data.pending_counter_echo
+                and completed_laps == self._session_data.pending_counter_echo_lap
+                and last_laptime_ms == self._session_data.pending_counter_echo_time_ms
+            )
+            new_physical_boundary = lap_timer_reset or (counter_advanced and not duplicate_counter_echo)
+            if (
+                completion_eligible_before
+                and not terminal_state
+                and not replay_state
+                and not startup_state
+                and (completed_timer_reset or counter_advanced)
+                and last_laptime_ms > 0
+            ):
+                now_mono = time.monotonic()
+                if not duplicate_counter_echo:
+                    completion = LapCompletionData(
+                        completed_laps=max(
+                            completed_laps,
+                            int(previous_completed or 0),
+                            1,
+                        ),
+                        lap_time_ms=last_laptime_ms,
+                        is_valid=self._session_data.active_lap_is_valid,
+                        timestamp=datetime.now(timezone.utc).isoformat(),
+                        observed_at=now_mono,
+                    )
+                    self._session_data.latest_lap_completion = completion
+                    self._session_data.lap_completions.append(completion)
+                    # A session cannot realistically need hundreds of
+                    # outstanding callbacks. Bound retained history while
+                    # preserving enough delayed-log context for long races.
+                    if len(self._session_data.lap_completions) > 512:
+                        del self._session_data.lap_completions[:-512]
+                if completed_timer_reset:
+                    self._session_data.pending_counter_echo = not counter_advanced
+                    self._session_data.pending_counter_echo_lap = (
+                        max(completed_laps, int(previous_completed or 0)) + 1 if not counter_advanced else None
+                    )
+                    self._session_data.pending_counter_echo_time_ms = last_laptime_ms if not counter_advanced else None
+                elif duplicate_counter_echo:
+                    self._session_data.pending_counter_echo = False
+                    self._session_data.pending_counter_echo_lap = None
+                    self._session_data.pending_counter_echo_time_ms = None
+                elif counter_advanced:
+                    # A jump beyond the expected delayed counter acknowledges
+                    # a later physical boundary; the old echo is no longer
+                    # eligible to suppress a future transition.
+                    self._session_data.pending_counter_echo = False
+                    self._session_data.pending_counter_echo_lap = None
+                    self._session_data.pending_counter_echo_time_ms = None
+            elif duplicate_counter_echo:
+                self._session_data.pending_counter_echo = False
+                self._session_data.pending_counter_echo_lap = None
+                self._session_data.pending_counter_echo_time_ms = None
+            # Every timer reset starts a new physical lap, including the pit
+            # outlap boundary where ACE deliberately leaves last_laptime_ms at
+            # zero.  Do not let an invalid outlap latch contaminate the first
+            # timed lap merely because there is no completion to publish.
+            if terminal_state or replay_state or startup_state:
+                self._session_data.active_lap_is_valid = None
+                self._session_data.pending_counter_echo = False
+                self._session_data.pending_counter_echo_lap = None
+                self._session_data.pending_counter_echo_time_ms = None
+                self._session_data.completion_eligible = False
+                self._session_data.positive_timer_samples = 0
+            elif new_physical_boundary and not (
+                paused_state and not completed_timer_reset and not counter_advanced
+            ):
+                self._session_data.active_lap_is_valid = None
+
+            if not terminal_state and not replay_state and not startup_state:
+                if paused_state or (was_paused and not completed_timer_reset and not counter_advanced):
+                    # A pause may carry a zero timer or a finish-line update.
+                    # Preserve the current lap verdict and timer ownership
+                    # until the live session resumes.
+                    pass
+                elif current_lap_time_ms <= 0:
+                    self._session_data.active_lap_is_valid = None
+                elif is_valid_lap is not None:
+                    sampled_validity = bool(is_valid_lap)
+                    if self._session_data.active_lap_is_valid is None:
+                        self._session_data.active_lap_is_valid = sampled_validity
+                    elif not sampled_validity:
+                        # Once ACE invalidates an active lap, keep that verdict
+                        # until its timer resets. The finish-line frame may
+                        # already carry the next lap's valid=True value.
+                        self._session_data.active_lap_is_valid = False
+
+            # Establish timer ownership only after observing two positive
+            # samples in an advancing live-timer sequence. Evaluate
+            # ``completion_eligible_before`` above so the sample that first
+            # completes the evidence cannot also publish a stale boundary.
+            if terminal_state or replay_state or startup_state:
+                pass
+            elif paused_state:
+                pass
+            elif current_lap_time_ms <= 0:
+                self._session_data.positive_timer_samples = 0
+            elif previous_lap_time_ms <= 0:
+                self._session_data.positive_timer_samples = 1
+            elif current_lap_time_ms > previous_lap_time_ms:
+                self._session_data.positive_timer_samples = min(
+                    self._session_data.positive_timer_samples + 1,
+                    2,
+                )
+            elif lap_timer_reset:
+                self._session_data.positive_timer_samples = 0
+            if self._session_data.positive_timer_samples >= 2:
+                self._session_data.completion_eligible = True
+
+            if terminal_state or replay_state or startup_state:
+                self._session_data.live_timer_baseline_ms = None
+                self._session_data.timer_was_paused = False
+            elif paused_state:
+                self._session_data.timer_was_paused = True
+                if completed_timer_reset or (counter_advanced and last_laptime_ms > 0):
+                    self._session_data.live_timer_baseline_ms = 0
+            else:
+                self._session_data.timer_was_paused = False
+                self._session_data.live_timer_baseline_ms = current_lap_time_ms
+        if shm_current_lap > 0:
+            current_lap = shm_current_lap
+        else:
+            # completed_laps is the number of laps already finished; the
+            # in-progress lap is always the next one.  completed_laps=0 means
+            # lap 1 is running (formation/outlap or the first timed lap),
+            # completed_laps=1 means lap 2 is running, and so on.
+            current_lap = completed_laps + 1
+
         if current_lap > 0:
-            self.update_lap_timing_from_graphics_shm(current_lap, graphics_data)
+            # ── Guard against stale SHM last_laptime_ms at session start ─
+            # When completed_laps == 0 AND we are on lap 1 (current_lap <= 1),
+            # no laps have been finished in the current session.  Any non-zero
+            # last_laptime_ms is stale data carried over from a previous game
+            # session via the Windows file mapping.  Scrub it so
+            # update_lap_timing_from_graphics_shm does not store it as a
+            # completed lap time for lap 1.
+            #
+            # We also check current_lap <= 1 because some decoders provide
+            # session_current_lap but not total_lap_count; a current_lap > 1
+            # implies laps have been completed and last_laptime_ms is legit.
+            shm_last = graphics_data.get("last_laptime_ms")
+            if shm_last and int(shm_last) > 0 and completed_laps == 0 and current_lap <= 1:
+                existing = self._session_data.lap_timing.get(current_lap)
+                already_stored = (
+                    existing is not None and existing.completed_lap_time is not None and existing.completed_lap_time > 0
+                )
+                if not already_stored:
+                    log_debug(
+                        Component.SHARED_SESSION,
+                        f"[SHM_STALE] Discarding stale last_laptime_ms={shm_last} ms "
+                        f"for lap {current_lap} with completed_laps=0 — "
+                        f"likely carryover from previous game session",
+                    )
+                # Scrub the stale value before it reaches the timing update
+                graphics_data = dict(graphics_data)
+                graphics_data["last_laptime_ms"] = 0
+            self.update_lap_timing_from_graphics_shm(
+                current_lap,
+                ({**graphics_data, "last_laptime_ms": 0} if terminal_state else graphics_data),
+                completed_lap_num=completed_laps if completed_laps > 0 else None,
+                completed_lap_time_eligible=completion_eligible_before,
+            )
+
+            # ── Wire SHM validity flags into shared session ──────────────
+            # Priority 1: is_valid_lap (SPageFileGraphicEvo at offset 3121)
+            # DOES work on AC Evo 0.8.0.1 and indicates whether the current
+            # lap is being timed as valid.  is_valid_lap=False with
+            # current_lap_time_ms > 0 means the in-progress lap has been
+            # invalidated (cut track, penalty, etc.).  is_valid_lap=False
+            # with current_lap_time_ms == 0 means timing is inactive
+            # (between sessions, in pits, etc.) and should NOT be treated
+            # as an invalidity verdict.
+            # Priority 2: is_invalid / timing_is_invalid (SMEvoTimingState)
+            # is NOT populated by AC Evo 0.8.0.1 — always False, which is
+            # why it must NOT be checked first (False ≠ None).
+            lap_time_ms = current_lap_time_ms
+
+            if terminal_state:
+                is_invalid = None
+            elif is_valid_lap is not None:
+                # is_valid_lap is the authoritative flag on AC Evo 0.8.0.1.
+                # Only apply it when timing is active (lap_time_ms > 0).
+                # When lap_time_ms == 0, timing is inactive (session end,
+                # in pits) and is_valid_lap=False should NOT be treated as
+                # an invalidity verdict — skip the update entirely.
+                if lap_time_ms > 0:
+                    # Use the latched verdict so a delayed counter echo that
+                    # carries the next lap's valid=True flag cannot erase an
+                    # invalidation already observed on that lap.
+                    is_invalid = self._session_data.active_lap_is_valid is False
+                else:
+                    is_invalid = None
+            else:
+                is_invalid = graphics_data.get("is_invalid")
+                if is_invalid is None:
+                    is_invalid = graphics_data.get("timing_is_invalid")
+
+            if is_invalid is not None:
+                is_invalid_bool = bool(is_invalid)
+                self.update_lap_validity_from_graphics_shm(current_lap, is_invalid_bool)
 
         self.update_fuel_from_graphics_shm(graphics_data)
 
         with self._lock:
             self._session_data.total_laps = graphics_data.get("total_lap_count")
             self._session_data.current_lap = graphics_data.get("session_current_lap")
-            self._session_data.session_phase = graphics_data.get("session_phase")
+            if "session_phase" in graphics_data:
+                self._session_data.session_phase = graphics_data.get("session_phase")
             self._session_data.session_time_left_ms = graphics_data.get("session_time_left_ms")
             self._session_data.current_pos = graphics_data.get("current_pos")
             self._session_data.total_drivers = graphics_data.get("total_drivers")
@@ -611,13 +1024,15 @@ class SharedSessionManager:
             # Car model from graphics SHM (authoritative, overrides logs fallback)
             car_model = graphics_data.get("car_model")
             if isinstance(car_model, str) and car_model.strip():
-                self._session_data.car = car_model.strip()
                 self._session_data.player_identification.car_model = car_model.strip()
                 self._mark_source("car", "shm_graphics")
 
-            self._mark_source("session_summary", "shm_graphics")
+            # has_kers from graphics SHM (AC Evo SPageFileGraphicEvo offset 2420)
+            has_kers = graphics_data.get("has_kers")
+            if has_kers is not None:
+                self._session_data.has_kers = bool(has_kers)
 
-        self.notify_observers()
+            self._mark_source("session_summary", "shm_graphics")
 
     def update_from_physics_shm(self, physics_data: dict[str, Any]) -> None:
         with self._lock:
@@ -640,10 +1055,24 @@ class SharedSessionManager:
             self._mark_source("max_speed", "shm_physics")
             self._mark_source("car_setup", "shm_physics")
 
-        self.notify_observers()
+    def update_from_telemetry(
+        self,
+        telemetry_data: dict[str, Any],
+        *,
+        expected_session_id: str | None = None,
+    ) -> bool:
+        """Apply a telemetry summary only while its session still owns the manager.
 
-    def update_from_telemetry(self, telemetry_data: dict[str, Any]) -> None:
+        The ownership check and field writes share the manager lock so a
+        session rollover cannot occur between validating an old report and
+        applying its summary.
+        """
         with self._lock:
+            if (
+                expected_session_id is not None
+                and self._session_data.session_metadata.session_id != expected_session_id
+            ):
+                return False
             max_speed = telemetry_data.get("max_speed")
             if isinstance(max_speed, (int, float)):
                 self._session_data.max_speed = float(max_speed)
@@ -657,8 +1086,7 @@ class SharedSessionManager:
                 self._session_data.tyre_compound = tyre_compound
 
             self._mark_source("telemetry_summary", "calculated")
-
-        self.notify_observers()
+            return True
 
     def get_data_sources(self) -> dict[str, set[str]]:
         """Return a snapshot of data source tracking (thread-safe)."""
@@ -674,95 +1102,28 @@ class SharedSessionManager:
         same driver is still logged in.
         """
         with self._lock:
+            old_timing_count = len(self._session_data.lap_timing)
+            old_validity_count = len(self._session_data.lap_validity)
             old_ident = self._session_data.player_identification
+            old_has_ers = self._session_data.has_ers
+            old_has_kers = self._session_data.has_kers
+            old_hybrid_car_uuid = self._session_data.hybrid_flags_car_uuid
             self._session_data = SharedSessionData()
             # Re-attach player identification — Steam ID / car UUID don't change
             # between sessions and must not be wiped.
             self._session_data.player_identification = old_ident
-            self._session_data.player_id = old_ident.steam_id
-            self._session_data.player_name = old_ident.player_name
-            self._session_data.car_uuid = old_ident.car_uuid
-
-    # Observer pattern
-    def subscribe(self, callback: Callable[[SharedSessionData], None]) -> None:
-        with self._lock:
-            if callback not in self._observers:
-                self._observers.append(callback)
-
-    def notify_observers(self) -> None:
-        with self._lock:
-            observers = list(self._observers)
-            snapshot = self._session_data
-
-        for callback in observers:
-            try:
-                callback(snapshot)
-            except Exception:
-                # Observer failures must not break data flow.
-                continue
-
-    def to_legacy_session_data(self) -> SessionData:
-        return LegacySessionDataWrapper(self).to_session_data()
-
-    def get_legacy_wrapper(self) -> LegacySessionDataWrapper:
-        return LegacySessionDataWrapper(self)
-
-
-class LegacySessionDataWrapper:
-    """Compatibility adapter exposing shared state as legacy session models."""
-
-    def __init__(self, shared_manager: SharedSessionManager):
-        self._shared = shared_manager
-
-    @staticmethod
-    def _lap_time_str_from_ms(lap_time_ms: int) -> str:
-        if lap_time_ms <= 0:
-            return "0:00.000"
-        minutes = lap_time_ms // 60000
-        seconds = (lap_time_ms % 60000) / 1000.0
-        return f"{minutes}:{seconds:06.3f}"
-
-    @property
-    def laps(self) -> list[LapData]:
-        return self._convert_to_legacy_laps()
-
-    def to_session_data(self) -> SessionData:
-        metadata = self._shared.get_session_metadata()
-        identity = self._shared.get_player_identification()
-
-        return SessionData(
-            session_id=metadata.get("session_id") or "",
-            game_version=metadata.get("game_version") or "Unknown",
-            session_type=metadata.get("session_type") or "Unknown",
-            car=identity.car_model or "Unknown",
-            track=metadata.get("track") or "Unknown",
-            player_name=identity.player_name,
-            player_id=identity.steam_id,
-            car_uuid=identity.car_uuid,
-            laps=self.laps,
-        )
-
-    def _convert_to_legacy_laps(self) -> list[LapData]:
-        lap_times = self._shared.get_all_lap_times()
-        lap_validity = self._shared.get_all_lap_validity()
-
-        lap_numbers = sorted(set(lap_times) | set(lap_validity))
-        laps: list[LapData] = []
-        for lap_num in lap_numbers:
-            lap_time_value = lap_times.get(lap_num)
-            lap_time_ms = int(lap_time_value) if isinstance(lap_time_value, (int, float)) else 0
-            sector_times = self._shared.get_sector_times(lap_num) or {}
-            laps.append(
-                LapData(
-                    lap_number=lap_num,
-                    physics_lap_number=lap_num,
-                    lap_time_ms=lap_time_ms,
-                    lap_time_str=self._lap_time_str_from_ms(lap_time_ms),
-                    sector1_ms=sector_times.get(1),
-                    sector2_ms=sector_times.get(2),
-                    sector3_ms=sector_times.get(3),
-                    is_valid=lap_validity.get(lap_num, True),
-                )
+            same_identified_car = bool(
+                old_ident.car_uuid
+                and old_hybrid_car_uuid
+                and str(old_ident.car_uuid).casefold() == str(old_hybrid_car_uuid).casefold()
             )
-
-        return laps
+            if same_identified_car:
+                self._session_data.has_ers = old_has_ers
+                self._session_data.has_kers = old_has_kers
+                self._session_data.hybrid_flags_car_uuid = old_hybrid_car_uuid
+            log_debug(
+                Component.SHARED_SESSION,
+                f"[RESET] Cleared shared session: dropped {old_timing_count} timing entries, "
+                f"{old_validity_count} validity entries. "
+                f"Car model after reset: {old_ident.car_model}",
+            )

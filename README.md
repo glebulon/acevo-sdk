@@ -123,19 +123,28 @@ from acevo import (
     RegionReader,
     FrameData,
     CaptureMetadata,
+    CaptureSnapshot,
+    LapBoundary,
     decode_physics,
     decode_graphics,
     decode_static,
+    peek_graphics_validity,
     LapData,
     SessionData,
     LapState,
+    LapCompletionData,
     SharedSessionManager,
+    is_hybrid_car,
 )
 ```
 
+Catalog helpers live under `acevo.catalogs` (`resolve_track_key`,
+`track_slug`, `select_track_profile`, `get_tuning_params`,
+`format_tuning_block`).
+
 ## Status
 
-`acevo-sdk` is Alpha software. Version `0.1.0` is the first extracted SDK release, so public APIs may change while real downstream use cases settle.
+`acevo-sdk` is Alpha software, so public APIs may change while real downstream use cases settle. `0.2.0` syncs the SDK with the current SimLaps telemetry core; `LapState.PUSH` was renamed to `LapState.VALID`.
 
 Please report issues at https://github.com/glebulon/acevo-sdk/issues.
 
@@ -150,11 +159,11 @@ python -m pip install -e ".[dev]"
 ruff check .
 pytest
 python -m build
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
-Create the GitHub Release for `v0.1.0`; the publish workflow uploads the package to PyPI.
+Create the GitHub Release for `v0.2.0`; the publish workflow uploads the package to PyPI.
 
 ## License
 

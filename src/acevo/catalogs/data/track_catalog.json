@@ -4,7 +4,9 @@
     "aliases": [
       "brands_hatch",
       "brands",
-      "brands-hatch"
+      "brands-hatch",
+      "brands hatch",
+      "brands hatch gp"
     ],
     "default_config": "gp",
     "configs": {
@@ -18,55 +20,64 @@
             "id": 1,
             "name": "Paddock Hill Bend",
             "start": 0.02,
-            "end": 0.07
+            "end": 0.07,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Druids Bend",
             "start": 0.145,
-            "end": 0.205
+            "end": 0.205,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Graham Hill Bend",
             "start": 0.255,
-            "end": 0.315
+            "end": 0.315,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Surtees",
             "start": 0.405,
-            "end": 0.455
+            "end": 0.455,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Hawthorn Bend",
             "start": 0.52,
-            "end": 0.575
+            "end": 0.575,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Westfield",
             "start": 0.61,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Sheene Curve",
             "start": 0.685,
-            "end": 0.73
+            "end": 0.73,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Stirlings",
             "start": 0.76,
-            "end": 0.82
+            "end": 0.82,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Clark Curve",
             "start": 0.92,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       },
@@ -80,43 +91,50 @@
             "id": 1,
             "name": "Paddock Hill Bend",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Druids Bend",
             "start": 0.18,
-            "end": 0.25
+            "end": 0.25,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Graham Hill Bend",
             "start": 0.35,
-            "end": 0.45
+            "end": 0.45,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Surtees",
             "start": 0.6,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "McLaren",
             "start": 0.65,
-            "end": 0.7
+            "end": 0.7,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Clearways",
             "start": 0.85,
-            "end": 0.95
+            "end": 0.95,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Clark Curve",
             "start": 0.97,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -133,50 +151,59 @@
       "indy": {
         "name": "Indy",
         "aliases": [
-          "indy"
+          "indy",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Paddock Hill Bend",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Druids Bend",
             "start": 0.18,
-            "end": 0.25
+            "end": 0.25,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Graham Hill Bend",
             "start": 0.35,
-            "end": 0.45
+            "end": 0.45,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Surtees",
             "start": 0.6,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "McLaren",
             "start": 0.65,
-            "end": 0.7
+            "end": 0.7,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Clearways",
             "start": 0.85,
-            "end": 0.95
+            "end": 0.95,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Clark Curve",
             "start": 0.97,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -188,7 +215,13 @@
       "circuit_de_spa_francorchamps",
       "spa",
       "spa-francorchamps",
-      "circuit_de_spa_"
+      "circuit_de_spa_",
+      "spa francorchamps",
+      "spa gp",
+      "spa francorchamps gp",
+      "circuit de spa francorchamps gp",
+      "circuit_de_spa_francorchamps gp",
+      "circuit de spa-francorchamps"
     ],
     "default_config": "current",
     "configs": {
@@ -204,121 +237,141 @@
             "id": 1,
             "name": "La Source",
             "start": 0.07,
-            "end": 0.1
+            "end": 0.1,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Eau Rouge",
             "start": 0.1,
-            "end": 0.108
+            "end": 0.108,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Raidillon Left",
             "start": 0.108,
-            "end": 0.117
+            "end": 0.117,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Raidillon Right",
             "start": 0.117,
-            "end": 0.126
+            "end": 0.126,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Les Combes 1",
             "start": 0.128,
-            "end": 0.145
+            "end": 0.145,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Les Combes 2",
             "start": 0.145,
-            "end": 0.16
+            "end": 0.16,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Les Combes 3",
             "start": 0.19,
-            "end": 0.208
+            "end": 0.208,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Malmedy",
             "start": 0.208,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Bruxelles (Rivage)",
             "start": 0.225,
-            "end": 0.26
+            "end": 0.26,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Jacky Ickx Corner",
             "start": 0.33,
-            "end": 0.352
+            "end": 0.352,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Pouhon 1",
             "start": 0.418,
-            "end": 0.442
+            "end": 0.442,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Pouhon 2",
             "start": 0.442,
-            "end": 0.472
+            "end": 0.472,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Fagnes 1 (Piff Paff)",
             "start": 0.488,
-            "end": 0.498
+            "end": 0.498,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Fagnes 2",
             "start": 0.498,
-            "end": 0.508
+            "end": 0.508,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Campus",
             "start": 0.71,
-            "end": 0.722
+            "end": 0.722,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Paul Frere",
             "start": 0.722,
-            "end": 0.752
+            "end": 0.752,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Blanchimont 1",
             "start": 0.82,
-            "end": 0.832
+            "end": 0.832,
+            "_confidence": "profiled"
           },
           {
             "id": 18,
             "name": "Blanchimont 2",
             "start": 0.832,
-            "end": 0.842
+            "end": 0.842,
+            "_confidence": "profiled"
           },
           {
             "id": 19,
             "name": "Bus Stop 1",
             "start": 0.928,
-            "end": 0.942
+            "end": 0.942,
+            "_confidence": "profiled"
           },
           {
             "id": 20,
             "name": "Bus Stop 2",
             "start": 0.942,
-            "end": 0.955
+            "end": 0.955,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -329,7 +382,8 @@
     "aliases": [
       "circuit_of_the_americas",
       "cota",
-      "circuit-of-the-americas"
+      "circuit-of-the-americas",
+      "americas"
     ],
     "default_config": "gp",
     "configs": {
@@ -344,121 +398,141 @@
             "id": 1,
             "name": "Big Red",
             "start": 0.01,
-            "end": 0.06
+            "end": 0.06,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.08,
-            "end": 0.11
+            "end": 0.11,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Esses 1",
             "start": 0.13,
-            "end": 0.15
+            "end": 0.15,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Esses 2",
             "start": 0.15,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Esses 3",
             "start": 0.17,
-            "end": 0.19
+            "end": 0.19,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Esses 4",
             "start": 0.19,
-            "end": 0.21
+            "end": 0.21,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 7",
             "start": 0.25,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Turn 8",
             "start": 0.28,
-            "end": 0.31
+            "end": 0.31,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Turn 9",
             "start": 0.31,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10",
             "start": 0.38,
-            "end": 0.4
+            "end": 0.4,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "The Bobby Pin",
             "start": 0.42,
-            "end": 0.47
+            "end": 0.47,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Turn 12",
             "start": 0.55,
-            "end": 0.6
+            "end": 0.6,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Turn 13",
             "start": 0.65,
-            "end": 0.68
+            "end": 0.68,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Turn 14",
             "start": 0.68,
-            "end": 0.71
+            "end": 0.71,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Turn 15",
             "start": 0.71,
-            "end": 0.75
+            "end": 0.75,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Triple Apex 1",
             "start": 0.8,
-            "end": 0.83
+            "end": 0.83,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Triple Apex 2",
             "start": 0.83,
-            "end": 0.86
+            "end": 0.86,
+            "_confidence": "profiled"
           },
           {
             "id": 18,
             "name": "Triple Apex 3",
             "start": 0.86,
-            "end": 0.89
+            "end": 0.89,
+            "_confidence": "profiled"
           },
           {
             "id": 19,
             "name": "Turn 19",
             "start": 0.91,
-            "end": 0.94
+            "end": 0.94,
+            "_confidence": "profiled"
           },
           {
             "id": 20,
             "name": "The Andretti",
             "start": 0.96,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -475,98 +549,115 @@
       "national": {
         "name": "National",
         "aliases": [
-          "national"
+          "national",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Big Red",
             "start": 0.02,
-            "end": 0.06
+            "end": 0.06,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.08,
-            "end": 0.11
+            "end": 0.11,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Esses 1",
             "start": 0.13,
-            "end": 0.15
+            "end": 0.15,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Esses 2",
             "start": 0.15,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Esses 3",
             "start": 0.17,
-            "end": 0.19
+            "end": 0.19,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Esses 4",
             "start": 0.19,
-            "end": 0.21
+            "end": 0.21,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 7",
             "start": 0.25,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Turn 8",
             "start": 0.28,
-            "end": 0.31
+            "end": 0.31,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Turn 9",
             "start": 0.31,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10",
             "start": 0.38,
-            "end": 0.4
+            "end": 0.4,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "The Bobby Pin",
             "start": 0.42,
-            "end": 0.47
+            "end": 0.47,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Turn 12",
             "start": 0.55,
-            "end": 0.6
+            "end": 0.6,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Turn 13",
             "start": 0.65,
-            "end": 0.68
+            "end": 0.68,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Turn 14",
             "start": 0.68,
-            "end": 0.71
+            "end": 0.71,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Turn 15",
             "start": 0.71,
-            "end": 0.75
+            "end": 0.75,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -576,69 +667,82 @@
     "name": "Donington Park National",
     "aliases": [
       "donington_park_national",
-      "donington_park"
+      "donington_park",
+      "donington",
+      "donington park"
     ],
     "default_config": "national",
     "configs": {
       "national": {
         "name": "National",
         "aliases": [
-          "national"
+          "national",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Redgate",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Hollywood",
             "start": 0.15,
-            "end": 0.18
+            "end": 0.18,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Craner Curves",
             "start": 0.18,
-            "end": 0.25
+            "end": 0.25,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Old Hairpin",
             "start": 0.32,
-            "end": 0.38
+            "end": 0.38,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Schwantz Curve",
             "start": 0.45,
-            "end": 0.48
+            "end": 0.48,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "McLean's",
             "start": 0.48,
-            "end": 0.52
+            "end": 0.52,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Coppice",
             "start": 0.65,
-            "end": 0.72
+            "end": 0.72,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Goddard's 1",
             "start": 0.85,
-            "end": 0.88
+            "end": 0.88,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Goddard's 2",
             "start": 0.88,
-            "end": 0.92
+            "end": 0.92,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -649,111 +753,129 @@
     "aliases": [
       "fuji_speedway",
       "fuji",
-      "fuji-speedway"
+      "fuji-speedway",
+      "fuji speedway"
     ],
     "default_config": "full",
     "configs": {
       "full": {
         "name": "Full",
         "aliases": [
-          "full"
+          "full",
+          "gp"
         ],
         "corners": [
           {
             "id": 1,
             "name": "TGR Corner",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Coca-Cola 1",
             "start": 0.12,
-            "end": 0.15
+            "end": 0.15,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Coca-Cola 2",
             "start": 0.15,
-            "end": 0.18
+            "end": 0.18,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "100R",
             "start": 0.22,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.35,
-            "end": 0.38
+            "end": 0.38,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Hairpin",
             "start": 0.38,
-            "end": 0.42
+            "end": 0.42,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 7",
             "start": 0.42,
-            "end": 0.45
+            "end": 0.45,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "300R",
             "start": 0.55,
-            "end": 0.6
+            "end": 0.6,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Dunlop 1",
             "start": 0.65,
-            "end": 0.68
+            "end": 0.68,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Dunlop 2",
             "start": 0.68,
-            "end": 0.71
+            "end": 0.71,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Turn 11",
             "start": 0.75,
-            "end": 0.78
+            "end": 0.78,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "GR Supra 1",
             "start": 0.82,
-            "end": 0.85
+            "end": 0.85,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "GR Supra 2",
             "start": 0.85,
-            "end": 0.88
+            "end": 0.88,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Panasonic 1",
             "start": 0.9,
-            "end": 0.93
+            "end": 0.93,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Panasonic 2",
             "start": 0.93,
-            "end": 0.96
+            "end": 0.96,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Final Corner",
             "start": 0.96,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -769,92 +891,108 @@
       "gp_short": {
         "name": "GP Short",
         "aliases": [
-          "gp_short"
+          "gp_short",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "TGR Corner",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Coca-Cola 1",
             "start": 0.12,
-            "end": 0.15
+            "end": 0.15,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Coca-Cola 2",
             "start": 0.15,
-            "end": 0.18
+            "end": 0.18,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "100R",
             "start": 0.22,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.35,
-            "end": 0.38
+            "end": 0.38,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "300R",
             "start": 0.42,
-            "end": 0.47
+            "end": 0.47,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Dunlop 1",
             "start": 0.57,
-            "end": 0.6
+            "end": 0.6,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Dunlop 2",
             "start": 0.6,
-            "end": 0.63
+            "end": 0.63,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Turn 9",
             "start": 0.67,
-            "end": 0.7
+            "end": 0.7,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10",
             "start": 0.7,
-            "end": 0.73
+            "end": 0.73,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "GR Supra 1",
             "start": 0.78,
-            "end": 0.81
+            "end": 0.81,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "GR Supra 2",
             "start": 0.81,
-            "end": 0.84
+            "end": 0.84,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Panasonic",
             "start": 0.89,
-            "end": 0.94
+            "end": 0.94,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Final Corner",
             "start": 0.94,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -864,129 +1002,150 @@
     "name": "Imola",
     "aliases": [
       "imola",
-      "autodromo-enzo-e-dino-ferrari"
+      "autodromo-enzo-e-dino-ferrari",
+      "enzo e dino ferrari"
     ],
     "default_config": "full",
     "configs": {
       "full": {
         "name": "Full",
         "aliases": [
-          "full"
+          "full",
+          "gp"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1 (Start Straight Kink)",
             "start": 0.01,
-            "end": 0.03
+            "end": 0.03,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Variante Tamburello 1",
             "start": 0.05,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Variante Tamburello 2",
             "start": 0.08,
-            "end": 0.11
+            "end": 0.11,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Variante Tamburello 3",
             "start": 0.11,
-            "end": 0.14
+            "end": 0.14,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Variante Villeneuve 1",
             "start": 0.18,
-            "end": 0.21
+            "end": 0.21,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Variante Villeneuve 2",
             "start": 0.21,
-            "end": 0.24
+            "end": 0.24,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Tosa",
             "start": 0.28,
-            "end": 0.32
+            "end": 0.32,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Piratella Kink",
             "start": 0.36,
-            "end": 0.38
+            "end": 0.38,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Piratella",
             "start": 0.38,
-            "end": 0.42
+            "end": 0.42,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Acque Minerali Kink",
             "start": 0.46,
-            "end": 0.48
+            "end": 0.48,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Acque Minerali 1",
             "start": 0.48,
-            "end": 0.51
+            "end": 0.51,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Acque Minerali 2",
             "start": 0.51,
-            "end": 0.54
+            "end": 0.54,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Acque Minerali 3",
             "start": 0.54,
-            "end": 0.57
+            "end": 0.57,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Variante Alta 1",
             "start": 0.62,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Variante Alta 2",
             "start": 0.65,
-            "end": 0.68
+            "end": 0.68,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Rivazza Kink",
             "start": 0.72,
-            "end": 0.74
+            "end": 0.74,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Rivazza 1",
             "start": 0.74,
-            "end": 0.78
+            "end": 0.78,
+            "_confidence": "profiled"
           },
           {
             "id": 18,
             "name": "Rivazza 2",
             "start": 0.78,
-            "end": 0.82
+            "end": 0.82,
+            "_confidence": "profiled"
           },
           {
             "id": 19,
             "name": "Finish Straight Kink",
             "start": 0.96,
-            "end": 0.98
+            "end": 0.98,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -999,7 +1158,10 @@
       "laguna",
       "laguna-seca",
       "mazda-raceway",
-      "weathertech-raceway"
+      "weathertech-raceway",
+      "laguna seca",
+      "laguna seca gp",
+      "mazda raceway laguna seca"
     ],
     "default_config": "full",
     "configs": {
@@ -1008,6 +1170,7 @@
         "aliases": [
           "full",
           "11-corner",
+          "gp",
           "11_corner"
         ],
         "corners": [
@@ -1015,67 +1178,78 @@
             "id": 1,
             "name": "Turn 1",
             "start": 0.02,
-            "end": 0.045
+            "end": 0.045,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Andretti Hairpin",
             "start": 0.07,
-            "end": 0.125
+            "end": 0.125,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.185,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.285,
-            "end": 0.325
+            "end": 0.325,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.38,
-            "end": 0.425
+            "end": 0.425,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 6",
             "start": 0.475,
-            "end": 0.52
+            "end": 0.52,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 7",
             "start": 0.555,
-            "end": 0.59
+            "end": 0.59,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Corkscrew",
             "start": 0.59,
-            "end": 0.645
+            "end": 0.645,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Rainey Curve",
             "start": 0.7,
-            "end": 0.745
+            "end": 0.745,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10",
             "start": 0.81,
-            "end": 0.85
+            "end": 0.85,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Turn 11",
             "start": 0.9,
-            "end": 0.96
+            "end": 0.96,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -1084,7 +1258,8 @@
   "monza": {
     "name": "Monza",
     "aliases": [
-      "monza"
+      "monza",
+      "autodromo nazionale di monza"
     ],
     "default_config": "v0_4",
     "configs": {
@@ -1101,67 +1276,78 @@
             "id": 1,
             "name": "Variante del Rettifilo (T1) Right",
             "start": 0.145,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Variante del Rettifilo (T2) Left",
             "start": 0.17,
-            "end": 0.195
+            "end": 0.195,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Curva Grande (T3)",
             "start": 0.22,
-            "end": 0.285
+            "end": 0.285,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Variante della Roggia (T4) Left",
             "start": 0.345,
-            "end": 0.372
+            "end": 0.372,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Variante della Roggia (T5) Right",
             "start": 0.372,
-            "end": 0.402
+            "end": 0.402,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Lesmo 1 (T6)",
             "start": 0.455,
-            "end": 0.505
+            "end": 0.505,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Lesmo 2 (T7)",
             "start": 0.515,
-            "end": 0.565
+            "end": 0.565,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Variante Ascari (T8) Left",
             "start": 0.635,
-            "end": 0.665
+            "end": 0.665,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Variante Ascari (T9) Right",
             "start": 0.665,
-            "end": 0.695
+            "end": 0.695,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Variante Ascari (T10) Left",
             "start": 0.695,
-            "end": 0.72
+            "end": 0.72,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Curva Parabolica (T11)",
             "start": 0.875,
-            "end": 0.93
+            "end": 0.93,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -1172,117 +1358,136 @@
     "aliases": [
       "mount_panorama",
       "bathurst",
-      "mount-panorama"
+      "mount-panorama",
+      "mount panorama"
     ],
     "default_config": "full",
     "configs": {
       "full": {
         "name": "Full",
         "aliases": [
-          "full"
+          "full",
+          "gp"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Hell Corner",
             "start": 0.015,
-            "end": 0.045
+            "end": 0.045,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Griffins Bend",
             "start": 0.185,
-            "end": 0.22
+            "end": 0.22,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "The Cutting 1",
             "start": 0.245,
-            "end": 0.275
+            "end": 0.275,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "The Cutting 2",
             "start": 0.275,
-            "end": 0.3
+            "end": 0.3,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Quarry Corner",
             "start": 0.315,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Reid Park Right",
             "start": 0.355,
-            "end": 0.385
+            "end": 0.385,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Reid Park Left",
             "start": 0.385,
-            "end": 0.415
+            "end": 0.415,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Sulman Park",
             "start": 0.43,
-            "end": 0.47
+            "end": 0.47,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "McPhillamy Park",
             "start": 0.485,
-            "end": 0.52
+            "end": 0.52,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Brock's Skyline",
             "start": 0.53,
-            "end": 0.55
+            "end": 0.55,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "The Esses",
             "start": 0.55,
-            "end": 0.57
+            "end": 0.57,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "The Dipper",
             "start": 0.57,
-            "end": 0.59
+            "end": 0.59,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Forrest's Elbow",
             "start": 0.59,
-            "end": 0.62
+            "end": 0.62,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "The Chase Kink",
             "start": 0.9,
-            "end": 0.92
+            "end": 0.92,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "The Chase Left",
             "start": 0.92,
-            "end": 0.945
+            "end": 0.945,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "The Chase Right",
             "start": 0.945,
-            "end": 0.965
+            "end": 0.965,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Murray's Corner",
             "start": 0.985,
-            "end": 0.998
+            "end": 0.998,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -1295,448 +1500,902 @@
       "nordschleife",
       "nurburgring-nordschleife",
       "nurburgring_touristenfahrten",
-      "nurburgring_24h"
+      "nurburgring_24h",
+      "nürburgring",
+      "nurburgring",
+      "nürburgring nordschleife"
     ],
     "default_config": "24h",
     "configs": {
       "24h": {
         "name": "24H",
         "aliases": [
-          "24h",
-          "touristenfahrten"
+          "24h"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Antoniusbuche",
             "start": 0.01,
-            "end": 0.02
+            "end": 0.02,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Tiergarten 1",
             "start": 0.02,
-            "end": 0.03
+            "end": 0.03,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Tiergarten 2",
             "start": 0.03,
-            "end": 0.04
+            "end": 0.04,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Hohenrain-Schikane 1",
             "start": 0.04,
-            "end": 0.045
+            "end": 0.045,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Hohenrain-Schikane 2",
             "start": 0.045,
-            "end": 0.05
+            "end": 0.05,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Hohenrain-Schikane 3",
             "start": 0.05,
-            "end": 0.055
+            "end": 0.055,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "T13",
             "start": 0.055,
-            "end": 0.06
+            "end": 0.06,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Sabine-Schmitz-Kurve",
             "start": 0.06,
-            "end": 0.065
+            "end": 0.065,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Hatzenbach Bogen",
             "start": 0.065,
-            "end": 0.07
+            "end": 0.07,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Hatzenbach 1",
             "start": 0.07,
-            "end": 0.075
+            "end": 0.075,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Hatzenbach 2",
             "start": 0.075,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Hatzenbach 3",
             "start": 0.08,
-            "end": 0.085
+            "end": 0.085,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Hatzenbach 4",
             "start": 0.085,
-            "end": 0.09
+            "end": 0.09,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Hatzenbach 5",
             "start": 0.09,
-            "end": 0.095
+            "end": 0.095,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Hatzenbach 6",
             "start": 0.095,
-            "end": 0.1
+            "end": 0.1,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Hatzenbach 7",
             "start": 0.1,
-            "end": 0.105
+            "end": 0.105,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Hoheichen 1",
             "start": 0.105,
-            "end": 0.11
+            "end": 0.11,
+            "_confidence": "profiled"
           },
           {
             "id": 18,
             "name": "Hoheichen 2",
             "start": 0.11,
-            "end": 0.115
+            "end": 0.115,
+            "_confidence": "profiled"
           },
           {
             "id": 19,
-            "name": "Quiddelbacher H\u00f6he 1",
+            "name": "Quiddelbacher Höhe 1",
             "start": 0.115,
-            "end": 0.12
+            "end": 0.12,
+            "_confidence": "profiled"
           },
           {
             "id": 20,
-            "name": "Quiddelbacher H\u00f6he 2",
+            "name": "Quiddelbacher Höhe 2",
             "start": 0.12,
-            "end": 0.125
+            "end": 0.125,
+            "_confidence": "profiled"
           },
           {
             "id": 21,
-            "name": "Quiddelbacher H\u00f6he 3",
+            "name": "Quiddelbacher Höhe 3",
             "start": 0.125,
-            "end": 0.13
+            "end": 0.13,
+            "_confidence": "profiled"
           },
           {
             "id": 22,
             "name": "Flugplatz",
             "start": 0.13,
-            "end": 0.135
+            "end": 0.135,
+            "_confidence": "profiled"
           },
           {
             "id": 23,
             "name": "Kottenborn",
             "start": 0.135,
-            "end": 0.14
+            "end": 0.14,
+            "_confidence": "profiled"
           },
           {
             "id": 24,
             "name": "Schwedenkreuz",
             "start": 0.14,
-            "end": 0.145
+            "end": 0.145,
+            "_confidence": "profiled"
           },
           {
             "id": 25,
             "name": "Aremberg",
             "start": 0.145,
-            "end": 0.15
+            "end": 0.15,
+            "_confidence": "profiled"
           },
           {
             "id": 26,
-            "name": "Fuchsr\u00f6hre 1",
+            "name": "Fuchsröhre 1",
             "start": 0.15,
-            "end": 0.155
+            "end": 0.155,
+            "_confidence": "profiled"
           },
           {
             "id": 27,
-            "name": "Fuchsr\u00f6hre 2",
+            "name": "Fuchsröhre 2",
             "start": 0.155,
-            "end": 0.16
+            "end": 0.16,
+            "_confidence": "profiled"
           },
           {
             "id": 28,
-            "name": "Fuchsr\u00f6hre 3",
+            "name": "Fuchsröhre 3",
             "start": 0.16,
-            "end": 0.165
+            "end": 0.165,
+            "_confidence": "profiled"
           },
           {
             "id": 29,
             "name": "Adenauer Forst 1",
             "start": 0.165,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 30,
             "name": "Adenauer Forst 2",
             "start": 0.17,
-            "end": 0.175
+            "end": 0.175,
+            "_confidence": "profiled"
           },
           {
             "id": 31,
             "name": "Adenauer Forst 3",
             "start": 0.175,
-            "end": 0.18
+            "end": 0.18,
+            "_confidence": "profiled"
           },
           {
             "id": 32,
             "name": "Adenauer Forst 4",
             "start": 0.18,
-            "end": 0.185
+            "end": 0.185,
+            "_confidence": "profiled"
           },
           {
             "id": 33,
             "name": "Metzgesfeld 1",
             "start": 0.185,
-            "end": 0.19
+            "end": 0.19,
+            "_confidence": "profiled"
           },
           {
             "id": 34,
             "name": "Metzgesfeld 2",
             "start": 0.19,
-            "end": 0.195
+            "end": 0.195,
+            "_confidence": "profiled"
           },
           {
             "id": 35,
             "name": "Kallenhard",
             "start": 0.195,
-            "end": 0.2
+            "end": 0.2,
+            "_confidence": "profiled"
           },
           {
             "id": 36,
             "name": "Spiegelkurve 1",
             "start": 0.2,
-            "end": 0.205
+            "end": 0.205,
+            "_confidence": "profiled"
           },
           {
             "id": 37,
             "name": "Spiegelkurve 2",
             "start": 0.205,
-            "end": 0.21
+            "end": 0.21,
+            "_confidence": "profiled"
           },
           {
             "id": 38,
             "name": "Miss-hit-miss 1",
             "start": 0.21,
-            "end": 0.215
+            "end": 0.215,
+            "_confidence": "profiled"
           },
           {
             "id": 39,
             "name": "Miss-hit-miss 2",
             "start": 0.215,
-            "end": 0.22
+            "end": 0.22,
+            "_confidence": "profiled"
           },
           {
             "id": 40,
             "name": "Miss-hit-miss 3",
             "start": 0.22,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 41,
             "name": "Wehrseifen 1",
             "start": 0.225,
-            "end": 0.23
+            "end": 0.23,
+            "_confidence": "profiled"
           },
           {
             "id": 42,
             "name": "Wehrseifen 2",
             "start": 0.23,
-            "end": 0.235
+            "end": 0.235,
+            "_confidence": "profiled"
           },
           {
             "id": 43,
             "name": "Wehrseifen 3",
             "start": 0.235,
-            "end": 0.24
+            "end": 0.24,
+            "_confidence": "profiled"
           },
           {
             "id": 44,
             "name": "Breidscheid 1",
             "start": 0.24,
-            "end": 0.245
+            "end": 0.245,
+            "_confidence": "profiled"
           },
           {
             "id": 45,
             "name": "Breidscheid 2",
             "start": 0.245,
-            "end": 0.25
+            "end": 0.25,
+            "_confidence": "profiled"
           },
           {
             "id": 46,
-            "name": "Ex-M\u00fchle",
+            "name": "Ex-Mühle",
             "start": 0.25,
-            "end": 0.255
+            "end": 0.255,
+            "_confidence": "profiled"
           },
           {
             "id": 47,
             "name": "Lauda Links",
             "start": 0.255,
-            "end": 0.26
+            "end": 0.26,
+            "_confidence": "profiled"
           },
           {
             "id": 48,
             "name": "Bergwerk",
             "start": 0.26,
-            "end": 0.265
+            "end": 0.265,
+            "_confidence": "profiled"
           },
           {
             "id": 49,
             "name": "Kesselchen",
             "start": 0.265,
-            "end": 0.27
+            "end": 0.27,
+            "_confidence": "profiled"
           },
           {
             "id": 50,
             "name": "Klostertal",
             "start": 0.27,
-            "end": 0.275
+            "end": 0.275,
+            "_confidence": "profiled"
           },
           {
             "id": 51,
             "name": "Mutkurve",
             "start": 0.275,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 52,
             "name": "Steilstrecke",
             "start": 0.28,
-            "end": 0.285
+            "end": 0.285,
+            "_confidence": "profiled"
           },
           {
             "id": 53,
             "name": "Carraciola-Karussell",
             "start": 0.285,
-            "end": 0.295
+            "end": 0.295,
+            "_confidence": "profiled"
           },
           {
             "id": 54,
             "name": "Hohe Acht",
             "start": 0.295,
-            "end": 0.3
+            "end": 0.3,
+            "_confidence": "profiled"
           },
           {
             "id": 55,
-            "name": "Hedgwigsh\u00f6he",
+            "name": "Hedgwigshöhe",
             "start": 0.3,
-            "end": 0.305
+            "end": 0.305,
+            "_confidence": "profiled"
           },
           {
             "id": 56,
             "name": "Wippermann",
             "start": 0.305,
-            "end": 0.31
+            "end": 0.31,
+            "_confidence": "profiled"
           },
           {
             "id": 57,
             "name": "Eschbach 1",
             "start": 0.31,
-            "end": 0.315
+            "end": 0.315,
+            "_confidence": "profiled"
           },
           {
             "id": 58,
             "name": "Eschbach 2",
             "start": 0.315,
-            "end": 0.32
+            "end": 0.32,
+            "_confidence": "profiled"
           },
           {
             "id": 59,
-            "name": "Br\u00fcnnchen 1",
+            "name": "Brünnchen 1",
             "start": 0.32,
-            "end": 0.325
+            "end": 0.325,
+            "_confidence": "profiled"
           },
           {
             "id": 60,
-            "name": "Br\u00fcnnchen 2",
+            "name": "Brünnchen 2",
             "start": 0.325,
-            "end": 0.33
+            "end": 0.33,
+            "_confidence": "profiled"
           },
           {
             "id": 61,
             "name": "Eiskurve 1",
             "start": 0.33,
-            "end": 0.335
+            "end": 0.335,
+            "_confidence": "profiled"
           },
           {
             "id": 62,
             "name": "Eiskurve 2",
             "start": 0.335,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 63,
             "name": "Pflanzgarten I",
             "start": 0.34,
-            "end": 0.345
+            "end": 0.345,
+            "_confidence": "profiled"
           },
           {
             "id": 64,
             "name": "Pflanzgarten II",
             "start": 0.345,
-            "end": 0.35
+            "end": 0.35,
+            "_confidence": "profiled"
           },
           {
             "id": 65,
             "name": "Stefan-Bellof-S 1",
             "start": 0.35,
-            "end": 0.355
+            "end": 0.355,
+            "_confidence": "profiled"
           },
           {
             "id": 66,
             "name": "Stefan-Bellof-S 2",
             "start": 0.355,
-            "end": 0.36
+            "end": 0.36,
+            "_confidence": "profiled"
           },
           {
             "id": 67,
             "name": "Stefan-Bellof-S 3",
             "start": 0.36,
-            "end": 0.365
+            "end": 0.365,
+            "_confidence": "profiled"
           },
           {
             "id": 68,
             "name": "Schwalbenschwanz 1",
             "start": 0.365,
-            "end": 0.37
+            "end": 0.37,
+            "_confidence": "profiled"
           },
           {
             "id": 69,
             "name": "Schwalbenschwanz 2",
             "start": 0.37,
-            "end": 0.375
+            "end": 0.375,
+            "_confidence": "profiled"
           },
           {
             "id": 70,
             "name": "Kleine Karussell",
             "start": 0.375,
-            "end": 0.38
+            "end": 0.38,
+            "_confidence": "profiled"
           },
           {
             "id": 71,
             "name": "Galgenkopf 1",
             "start": 0.38,
-            "end": 0.39
+            "end": 0.39,
+            "_confidence": "profiled"
           },
           {
             "id": 72,
             "name": "Galgenkopf 2",
             "start": 0.39,
-            "end": 0.4
+            "end": 0.4,
+            "_confidence": "profiled"
+          }
+        ]
+      },
+      "nordschleife": {
+        "name": "Nordschleife",
+        "aliases": [
+          "nordschleife",
+          "touristenfahrten"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "C1",
+            "start": 0.0073,
+            "end": 0.0143,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "C2",
+            "start": 0.0167,
+            "end": 0.0237,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "C3",
+            "start": 0.0251,
+            "end": 0.0321,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "C4",
+            "start": 0.035,
+            "end": 0.042,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "C5",
+            "start": 0.0433,
+            "end": 0.0503,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "C6",
+            "start": 0.0483,
+            "end": 0.0553,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "C7",
+            "start": 0.0545,
+            "end": 0.0615,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "C8",
+            "start": 0.0607,
+            "end": 0.0677,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "C9",
+            "start": 0.0733,
+            "end": 0.0803,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "C10",
+            "start": 0.1115,
+            "end": 0.1185,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "C11",
+            "start": 0.1819,
+            "end": 0.1889,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "C12",
+            "start": 0.2106,
+            "end": 0.2176,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "C13",
+            "start": 0.226,
+            "end": 0.233,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 14,
+            "name": "C14",
+            "start": 0.2424,
+            "end": 0.2494,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 15,
+            "name": "C15",
+            "start": 0.2497,
+            "end": 0.2567,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 16,
+            "name": "C16",
+            "start": 0.2888,
+            "end": 0.2958,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 17,
+            "name": "C17",
+            "start": 0.2976,
+            "end": 0.3046,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 18,
+            "name": "C18",
+            "start": 0.3092,
+            "end": 0.3162,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 19,
+            "name": "C19",
+            "start": 0.3226,
+            "end": 0.3296,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 20,
+            "name": "C20",
+            "start": 0.3345,
+            "end": 0.3415,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 21,
+            "name": "C21",
+            "start": 0.3391,
+            "end": 0.3461,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 22,
+            "name": "C22",
+            "start": 0.3525,
+            "end": 0.3595,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 23,
+            "name": "C23",
+            "start": 0.3786,
+            "end": 0.3856,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 24,
+            "name": "C24",
+            "start": 0.3896,
+            "end": 0.3966,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 25,
+            "name": "C25",
+            "start": 0.4167,
+            "end": 0.4237,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 26,
+            "name": "C26",
+            "start": 0.4285,
+            "end": 0.4355,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 27,
+            "name": "C27",
+            "start": 0.4734,
+            "end": 0.4804,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 28,
+            "name": "C28",
+            "start": 0.505,
+            "end": 0.512,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 29,
+            "name": "C29",
+            "start": 0.521,
+            "end": 0.528,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 30,
+            "name": "C30",
+            "start": 0.5414,
+            "end": 0.5484,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 31,
+            "name": "C31",
+            "start": 0.5554,
+            "end": 0.5624,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 32,
+            "name": "C32",
+            "start": 0.5767,
+            "end": 0.5837,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 33,
+            "name": "C33",
+            "start": 0.6052,
+            "end": 0.6122,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 34,
+            "name": "C34",
+            "start": 0.6127,
+            "end": 0.6197,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 35,
+            "name": "C35",
+            "start": 0.617,
+            "end": 0.624,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 36,
+            "name": "C36",
+            "start": 0.6243,
+            "end": 0.6313,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 37,
+            "name": "C37",
+            "start": 0.6403,
+            "end": 0.6473,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 38,
+            "name": "C38",
+            "start": 0.6529,
+            "end": 0.6599,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 39,
+            "name": "C39",
+            "start": 0.661,
+            "end": 0.668,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 40,
+            "name": "C40",
+            "start": 0.6732,
+            "end": 0.6802,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 41,
+            "name": "C41",
+            "start": 0.681,
+            "end": 0.688,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 42,
+            "name": "C42",
+            "start": 0.6924,
+            "end": 0.6994,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 43,
+            "name": "C43",
+            "start": 0.708,
+            "end": 0.715,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 44,
+            "name": "C44",
+            "start": 0.7161,
+            "end": 0.7231,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 45,
+            "name": "C45",
+            "start": 0.7355,
+            "end": 0.7425,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 46,
+            "name": "C46",
+            "start": 0.7455,
+            "end": 0.7525,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 47,
+            "name": "C47",
+            "start": 0.7636,
+            "end": 0.7706,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 48,
+            "name": "C48",
+            "start": 0.7925,
+            "end": 0.7995,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 49,
+            "name": "C49",
+            "start": 0.8033,
+            "end": 0.8103,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 50,
+            "name": "C50",
+            "start": 0.8145,
+            "end": 0.8215,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 51,
+            "name": "C51",
+            "start": 0.8304,
+            "end": 0.8374,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 52,
+            "name": "C52",
+            "start": 0.8406,
+            "end": 0.8476,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 53,
+            "name": "C53",
+            "start": 0.845,
+            "end": 0.852,
+            "_confidence": "estimated"
           }
         ]
       }
@@ -1752,50 +2411,59 @@
       "fosters": {
         "name": "Fosters",
         "aliases": [
-          "fosters"
+          "fosters",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Old Hall",
             "start": 0.03,
-            "end": 0.1
+            "end": 0.1,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Cascades",
             "start": 0.18,
-            "end": 0.3
+            "end": 0.3,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Fosters",
             "start": 0.365,
-            "end": 0.42
+            "end": 0.42,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Knickerbrook",
             "start": 0.58,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Druids",
             "start": 0.79,
-            "end": 0.87
+            "end": 0.87,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Lodge Corner",
             "start": 0.935,
-            "end": 0.98
+            "end": 0.98,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Deer Leap",
             "start": 0.98,
-            "end": 0.997
+            "end": 0.997,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -1804,117 +2472,138 @@
   "oulton_park_international": {
     "name": "Oulton Park International",
     "aliases": [
-      "oulton_park_international"
+      "oulton_park_international",
+      "oulton park",
+      "oulton"
     ],
     "default_config": "international",
     "configs": {
       "international": {
         "name": "International",
         "aliases": [
-          "international"
+          "international",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Old Hall",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Denton's",
             "start": 0.11,
-            "end": 0.135
+            "end": 0.135,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Cascades",
             "start": 0.135,
-            "end": 0.205
+            "end": 0.205,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Island Bend",
             "start": 0.28,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Shell Oils",
             "start": 0.42,
-            "end": 0.485
+            "end": 0.485,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Britten's 1",
             "start": 0.55,
-            "end": 0.565
+            "end": 0.565,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Britten's 2",
             "start": 0.565,
-            "end": 0.58
+            "end": 0.58,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Britten's 3",
             "start": 0.58,
-            "end": 0.595
+            "end": 0.595,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Britten's 4",
             "start": 0.595,
-            "end": 0.61
+            "end": 0.61,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Hislop's 1",
             "start": 0.7,
-            "end": 0.725
+            "end": 0.725,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Hislop's 2",
             "start": 0.725,
-            "end": 0.755
+            "end": 0.755,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Knickerbrook",
             "start": 0.8,
-            "end": 0.85
+            "end": 0.85,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Clay Hill",
             "start": 0.865,
-            "end": 0.88
+            "end": 0.88,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Water Tower",
             "start": 0.88,
-            "end": 0.895
+            "end": 0.895,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "Druids",
             "start": 0.895,
-            "end": 0.94
+            "end": 0.94,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Lodge Corner",
             "start": 0.965,
-            "end": 0.988
+            "end": 0.988,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Deer Leap",
             "start": 0.988,
-            "end": 0.998
+            "end": 0.998,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -1925,7 +2614,9 @@
     "aliases": [
       "red_bull_ring",
       "red-bull-ring",
-      "rbr"
+      "rbr",
+      "red bull ring",
+      "spielberg"
     ],
     "default_config": "full",
     "configs": {
@@ -1940,61 +2631,71 @@
             "id": 1,
             "name": "T1 - Niki Lauda Turn",
             "start": 0.015,
-            "end": 0.07
+            "end": 0.07,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
-            "name": "T2 - M\u00fcnzer Turn",
+            "name": "T2 - Münzer Turn",
             "start": 0.135,
-            "end": 0.165
+            "end": 0.165,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "T3",
             "start": 0.19,
-            "end": 0.255
+            "end": 0.255,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "T4 - Rauch Turn",
             "start": 0.345,
-            "end": 0.395
+            "end": 0.395,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "T5",
             "start": 0.495,
-            "end": 0.52
+            "end": 0.52,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "T6",
             "start": 0.545,
-            "end": 0.585
+            "end": 0.585,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "T7 - Graz Turn",
             "start": 0.595,
-            "end": 0.645
+            "end": 0.645,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "T8",
             "start": 0.735,
-            "end": 0.77
+            "end": 0.77,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "T9 - Jochen Rindt Turn",
             "start": 0.8,
-            "end": 0.855
+            "end": 0.855,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "T10",
             "start": 0.9,
-            "end": 0.955
+            "end": 0.955,
+            "_confidence": "profiled"
           }
         ]
       },
@@ -2008,43 +2709,50 @@
             "id": 1,
             "name": "Turn 3",
             "start": 0.2,
-            "end": 0.26
+            "end": 0.26,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 4",
             "start": 0.35,
-            "end": 0.4
+            "end": 0.4,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 5",
             "start": 0.5,
-            "end": 0.52
+            "end": 0.52,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 6",
             "start": 0.55,
-            "end": 0.6
+            "end": 0.6,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 7",
             "start": 0.6,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 8",
             "start": 0.75,
-            "end": 0.8
+            "end": 0.8,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 9",
             "start": 0.85,
-            "end": 0.9
+            "end": 0.9,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2055,7 +2763,8 @@
     "aliases": [
       "suzuka",
       "suzuka-circuit",
-      "suzuka_circuit"
+      "suzuka_circuit",
+      "suzuka circuit"
     ],
     "default_config": "full",
     "configs": {
@@ -2070,109 +2779,127 @@
             "id": 1,
             "name": "Turn 1",
             "start": 0.01,
-            "end": 0.038
+            "end": 0.038,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.038,
-            "end": 0.072
+            "end": 0.072,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.095,
-            "end": 0.118
+            "end": 0.118,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.118,
-            "end": 0.143
+            "end": 0.143,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.143,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 6",
             "start": 0.17,
-            "end": 0.205
+            "end": 0.205,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Dunlop Curve",
             "start": 0.205,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Degner 1",
             "start": 0.305,
-            "end": 0.33
+            "end": 0.33,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Degner 2",
             "start": 0.33,
-            "end": 0.36
+            "end": 0.36,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10 (Bridge Curve)",
             "start": 0.395,
-            "end": 0.41
+            "end": 0.41,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Hairpin",
             "start": 0.425,
-            "end": 0.46
+            "end": 0.46,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Turn 12 (200R)",
             "start": 0.54,
-            "end": 0.56
+            "end": 0.56,
+            "_confidence": "profiled"
           },
           {
             "id": 13,
             "name": "Spoon 1",
             "start": 0.615,
-            "end": 0.65
+            "end": 0.65,
+            "_confidence": "profiled"
           },
           {
             "id": 14,
             "name": "Spoon 2",
             "start": 0.65,
-            "end": 0.695
+            "end": 0.695,
+            "_confidence": "profiled"
           },
           {
             "id": 15,
             "name": "130R",
             "start": 0.835,
-            "end": 0.87
+            "end": 0.87,
+            "_confidence": "profiled"
           },
           {
             "id": 16,
             "name": "Casio Triangle Right",
             "start": 0.925,
-            "end": 0.95
+            "end": 0.95,
+            "_confidence": "profiled"
           },
           {
             "id": 17,
             "name": "Casio Triangle Left",
             "start": 0.95,
-            "end": 0.97
+            "end": 0.97,
+            "_confidence": "profiled"
           },
           {
             "id": 18,
             "name": "Final Right",
             "start": 0.97,
-            "end": 0.99
+            "end": 0.99,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2189,50 +2916,59 @@
       "east": {
         "name": "East",
         "aliases": [
-          "east"
+          "east",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.01,
-            "end": 0.04
+            "end": 0.04,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.04,
-            "end": 0.07
+            "end": 0.07,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.1,
-            "end": 0.13
+            "end": 0.13,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.13,
-            "end": 0.16
+            "end": 0.16,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.16,
-            "end": 0.19
+            "end": 0.19,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 6",
             "start": 0.19,
-            "end": 0.22
+            "end": 0.22,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Dunlop Curve",
             "start": 0.22,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2249,68 +2985,80 @@
       "west": {
         "name": "West",
         "aliases": [
-          "west"
+          "west",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.01,
-            "end": 0.04
+            "end": 0.04,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.04,
-            "end": 0.07
+            "end": 0.07,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.1,
-            "end": 0.13
+            "end": 0.13,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.13,
-            "end": 0.16
+            "end": 0.16,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Turn 5",
             "start": 0.16,
-            "end": 0.19
+            "end": 0.19,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 6",
             "start": 0.19,
-            "end": 0.22
+            "end": 0.22,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "130R West",
             "start": 0.22,
-            "end": 0.28
+            "end": 0.28,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Casio Chicane 1",
             "start": 0.28,
-            "end": 0.31
+            "end": 0.31,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Casio Chicane 2",
             "start": 0.31,
-            "end": 0.34
+            "end": 0.34,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Turn 10",
             "start": 0.34,
-            "end": 0.37
+            "end": 0.37,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2320,87 +3068,102 @@
     "name": "Watkins Glen International",
     "aliases": [
       "watkins_glen_international",
-      "watkins_glen_internati"
+      "watkins_glen_internati",
+      "watkins glen",
+      "watkins glen international"
     ],
     "default_config": "full",
     "configs": {
       "full": {
         "name": "Full",
         "aliases": [
-          "full"
+          "full",
+          "gp"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.02,
-            "end": 0.075
+            "end": 0.075,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Esses 1",
             "start": 0.13,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Esses 2",
             "start": 0.17,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Esses 3",
             "start": 0.225,
-            "end": 0.275
+            "end": 0.275,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Inner Loop",
             "start": 0.42,
-            "end": 0.505
+            "end": 0.505,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Outer Loop",
             "start": 0.61,
-            "end": 0.7
+            "end": 0.7,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Toe",
             "start": 0.73,
-            "end": 0.775
+            "end": 0.775,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Boot Right Hairpin",
             "start": 0.79,
-            "end": 0.845
+            "end": 0.845,
+            "_confidence": "profiled"
           },
           {
             "id": 9,
             "name": "Boot Crest Right",
             "start": 0.855,
-            "end": 0.895
+            "end": 0.895,
+            "_confidence": "profiled"
           },
           {
             "id": 10,
             "name": "Heel",
             "start": 0.905,
-            "end": 0.945
+            "end": 0.945,
+            "_confidence": "profiled"
           },
           {
             "id": 11,
             "name": "Turn 10",
             "start": 0.955,
-            "end": 0.98
+            "end": 0.98,
+            "_confidence": "profiled"
           },
           {
             "id": 12,
             "name": "Turn 11",
             "start": 0.985,
-            "end": 0.998
+            "end": 0.998,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2416,56 +3179,66 @@
       "short": {
         "name": "Short",
         "aliases": [
-          "short"
+          "short",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.02,
-            "end": 0.075
+            "end": 0.075,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.13,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.17,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.225,
-            "end": 0.275
+            "end": 0.275,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Inner Loop",
             "start": 0.42,
-            "end": 0.505
+            "end": 0.505,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 5 (Carousel)",
             "start": 0.61,
-            "end": 0.715
+            "end": 0.715,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 6",
             "start": 0.845,
-            "end": 0.895
+            "end": 0.895,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Turn 7",
             "start": 0.93,
-            "end": 0.985
+            "end": 0.985,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2481,56 +3254,66 @@
       "gp_inner_loop": {
         "name": "GP Inner Loop",
         "aliases": [
-          "gp_inner_loop"
+          "gp_inner_loop",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.02,
-            "end": 0.08
+            "end": 0.08,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Esses 1",
             "start": 0.12,
-            "end": 0.165
+            "end": 0.165,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Esses 2",
             "start": 0.165,
-            "end": 0.22
+            "end": 0.22,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Esses 3",
             "start": 0.22,
-            "end": 0.27
+            "end": 0.27,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Inner Loop",
             "start": 0.42,
-            "end": 0.505
+            "end": 0.505,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Outer Loop",
             "start": 0.61,
-            "end": 0.715
+            "end": 0.715,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 6",
             "start": 0.845,
-            "end": 0.895
+            "end": 0.895,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Turn 7",
             "start": 0.93,
-            "end": 0.985
+            "end": 0.985,
+            "_confidence": "profiled"
           }
         ]
       }
@@ -2546,56 +3329,1204 @@
       "short_inner_loop": {
         "name": "Short Inner Loop",
         "aliases": [
-          "short_inner_loop"
+          "short_inner_loop",
+          "gp",
+          "full"
         ],
         "corners": [
           {
             "id": 1,
             "name": "Turn 1",
             "start": 0.02,
-            "end": 0.075
+            "end": 0.075,
+            "_confidence": "profiled"
           },
           {
             "id": 2,
             "name": "Turn 2",
             "start": 0.13,
-            "end": 0.17
+            "end": 0.17,
+            "_confidence": "profiled"
           },
           {
             "id": 3,
             "name": "Turn 3",
             "start": 0.17,
-            "end": 0.225
+            "end": 0.225,
+            "_confidence": "profiled"
           },
           {
             "id": 4,
             "name": "Turn 4",
             "start": 0.225,
-            "end": 0.275
+            "end": 0.275,
+            "_confidence": "profiled"
           },
           {
             "id": 5,
             "name": "Inner Loop",
             "start": 0.42,
-            "end": 0.505
+            "end": 0.505,
+            "_confidence": "profiled"
           },
           {
             "id": 6,
             "name": "Turn 5 (Carousel)",
             "start": 0.61,
-            "end": 0.715
+            "end": 0.715,
+            "_confidence": "profiled"
           },
           {
             "id": 7,
             "name": "Turn 6",
             "start": 0.845,
-            "end": 0.895
+            "end": 0.895,
+            "_confidence": "profiled"
           },
           {
             "id": 8,
             "name": "Turn 7",
             "start": 0.93,
-            "end": 0.985
+            "end": 0.985,
+            "_confidence": "profiled"
+          }
+        ]
+      }
+    }
+  },
+  "silverstone": {
+    "name": "Silverstone Circuit",
+    "aliases": [
+      "silverstone",
+      "silverstone-circuit",
+      "silverstone_circuit",
+      "silverstone gp"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "Abbey",
+            "start": 0.0,
+            "end": 0.035,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "Farm Curve",
+            "start": 0.035,
+            "end": 0.055,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "Village",
+            "start": 0.07,
+            "end": 0.095,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "The Loop",
+            "start": 0.095,
+            "end": 0.125,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "Aintree",
+            "start": 0.125,
+            "end": 0.15,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "Wellington Straight Kink",
+            "start": 0.185,
+            "end": 0.195,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "Brooklands",
+            "start": 0.22,
+            "end": 0.25,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "Luffield",
+            "start": 0.26,
+            "end": 0.295,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "Woodcote",
+            "start": 0.315,
+            "end": 0.33,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "Copse",
+            "start": 0.375,
+            "end": 0.41,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "Maggots",
+            "start": 0.43,
+            "end": 0.455,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "Becketts",
+            "start": 0.455,
+            "end": 0.49,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "Chapel",
+            "start": 0.49,
+            "end": 0.51,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 14,
+            "name": "Hangar Straight Kink",
+            "start": 0.54,
+            "end": 0.55,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 15,
+            "name": "Stowe",
+            "start": 0.61,
+            "end": 0.65,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 16,
+            "name": "Vale",
+            "start": 0.7,
+            "end": 0.73,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 17,
+            "name": "Club",
+            "start": 0.73,
+            "end": 0.765,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 18,
+            "name": "Hamilton Straight Kink",
+            "start": 0.82,
+            "end": 0.845,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "nurburgring_gp": {
+    "name": "Nurburgring GP",
+    "aliases": [
+      "nurburgring_gp",
+      "nurburgring-gp",
+      "nurburgring grand prix",
+      "nürburgring gp",
+      "nurburgring",
+      "nürburgring"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1 (Castrol)",
+            "start": 0.01,
+            "end": 0.05,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.08,
+            "end": 0.12,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3 (Falken)",
+            "start": 0.2,
+            "end": 0.27,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4 (Dunlop)",
+            "start": 0.32,
+            "end": 0.37,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5 (Shell)",
+            "start": 0.4,
+            "end": 0.44,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6 (RTL)",
+            "start": 0.48,
+            "end": 0.53,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7 (Bit)",
+            "start": 0.58,
+            "end": 0.62,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8 (Veedol)",
+            "start": 0.65,
+            "end": 0.7,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9 (NGK)",
+            "start": 0.75,
+            "end": 0.79,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10 (Mobil 1)",
+            "start": 0.82,
+            "end": 0.87,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11 (Aral)",
+            "start": 0.92,
+            "end": 0.96,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12 (Michael Schumacher S)",
+            "start": 0.96,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "barcelona": {
+    "name": "Circuit de Barcelona-Catalunya",
+    "aliases": [
+      "barcelona",
+      "catalunya",
+      "barcelona-catalunya",
+      "circuit de barcelona-catalunya"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1 (Elf)",
+            "start": 0.02,
+            "end": 0.06,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.08,
+            "end": 0.12,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.12,
+            "end": 0.15,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4 (Repsol)",
+            "start": 0.18,
+            "end": 0.23,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5 (Seat)",
+            "start": 0.28,
+            "end": 0.33,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.38,
+            "end": 0.42,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.42,
+            "end": 0.45,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8",
+            "start": 0.45,
+            "end": 0.49,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9 (Campsa)",
+            "start": 0.52,
+            "end": 0.58,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10 (La Caixa)",
+            "start": 0.62,
+            "end": 0.67,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11",
+            "start": 0.72,
+            "end": 0.77,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12",
+            "start": 0.82,
+            "end": 0.86,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "T13 (European)",
+            "start": 0.9,
+            "end": 0.94,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 14,
+            "name": "T14 (New Holland)",
+            "start": 0.94,
+            "end": 0.97,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "hungaroring": {
+    "name": "Hungaroring",
+    "aliases": [
+      "hungaroring",
+      "budapest",
+      "hungary"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1",
+            "start": 0.03,
+            "end": 0.08,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.1,
+            "end": 0.15,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.2,
+            "end": 0.24,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4",
+            "start": 0.27,
+            "end": 0.35,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5",
+            "start": 0.4,
+            "end": 0.44,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.48,
+            "end": 0.55,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.58,
+            "end": 0.62,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8",
+            "start": 0.65,
+            "end": 0.69,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9",
+            "start": 0.72,
+            "end": 0.76,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10",
+            "start": 0.8,
+            "end": 0.84,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11",
+            "start": 0.86,
+            "end": 0.9,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12",
+            "start": 0.92,
+            "end": 0.96,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "T13",
+            "start": 0.96,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "zandvoort": {
+    "name": "Circuit Zandvoort",
+    "aliases": [
+      "zandvoort",
+      "circuit-zandvoort",
+      "zandvoort circuit"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1 (Tarzan)",
+            "start": 0.02,
+            "end": 0.08,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2 (Gerlach)",
+            "start": 0.12,
+            "end": 0.16,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3 (Hugenholtz)",
+            "start": 0.2,
+            "end": 0.28,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4 (Hunserug)",
+            "start": 0.32,
+            "end": 0.38,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5 (Slotemaker)",
+            "start": 0.42,
+            "end": 0.46,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.48,
+            "end": 0.52,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.55,
+            "end": 0.6,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8 (Masters)",
+            "start": 0.65,
+            "end": 0.7,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9 (Renee)",
+            "start": 0.72,
+            "end": 0.76,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10 (Bocht 10)",
+            "start": 0.8,
+            "end": 0.85,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11 (Arie Luyendijk)",
+            "start": 0.88,
+            "end": 0.92,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12 (Chicane)",
+            "start": 0.95,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "portimao": {
+    "name": "Algarve International Circuit",
+    "aliases": [
+      "portimao",
+      "algarve",
+      "autodromo internacional do algarve"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1",
+            "start": 0.02,
+            "end": 0.06,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.08,
+            "end": 0.12,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.18,
+            "end": 0.22,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4",
+            "start": 0.25,
+            "end": 0.3,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5 (Kink)",
+            "start": 0.35,
+            "end": 0.38,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.42,
+            "end": 0.48,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.52,
+            "end": 0.56,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8",
+            "start": 0.58,
+            "end": 0.62,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9",
+            "start": 0.65,
+            "end": 0.7,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10",
+            "start": 0.75,
+            "end": 0.8,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11",
+            "start": 0.83,
+            "end": 0.87,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12",
+            "start": 0.9,
+            "end": 0.94,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "T13",
+            "start": 0.94,
+            "end": 0.97,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 14,
+            "name": "T14",
+            "start": 0.97,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "kyalami": {
+    "name": "Kyalami Grand Prix Circuit",
+    "aliases": [
+      "kyalami",
+      "kyalami-gp",
+      "kyalami circuit"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1",
+            "start": 0.03,
+            "end": 0.08,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.12,
+            "end": 0.18,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.22,
+            "end": 0.26,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4",
+            "start": 0.3,
+            "end": 0.34,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5",
+            "start": 0.38,
+            "end": 0.42,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6 (Sunset)",
+            "start": 0.48,
+            "end": 0.52,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7 (Jukskei)",
+            "start": 0.55,
+            "end": 0.62,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8 (Esses 1)",
+            "start": 0.65,
+            "end": 0.68,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9 (Esses 2)",
+            "start": 0.68,
+            "end": 0.72,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10 (Coca-Cola)",
+            "start": 0.75,
+            "end": 0.82,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11 (Kink)",
+            "start": 0.88,
+            "end": 0.91,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12",
+            "start": 0.94,
+            "end": 0.98,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "road_america": {
+    "name": "Road America",
+    "aliases": [
+      "road_america",
+      "road-america",
+      "road america",
+      "elkhart lake"
+    ],
+    "default_config": "full",
+    "configs": {
+      "full": {
+        "name": "Full",
+        "aliases": [
+          "full",
+          "gp"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1",
+            "start": 0.02,
+            "end": 0.07,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.12,
+            "end": 0.16,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.2,
+            "end": 0.25,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4",
+            "start": 0.28,
+            "end": 0.35,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5 (Canada Corner)",
+            "start": 0.38,
+            "end": 0.44,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.5,
+            "end": 0.55,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7 (The Bend)",
+            "start": 0.58,
+            "end": 0.64,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8 (Carousel)",
+            "start": 0.68,
+            "end": 0.74,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9 (Kettle Bottle)",
+            "start": 0.78,
+            "end": 0.82,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10",
+            "start": 0.84,
+            "end": 0.88,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11 (Bill Mitchell)",
+            "start": 0.9,
+            "end": 0.95,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12 (Victory)",
+            "start": 0.96,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "misano": {
+    "name": "Misano World Circuit",
+    "aliases": [
+      "misano",
+      "misano-world-circuit",
+      "marco simoncelli"
+    ],
+    "default_config": "full",
+    "configs": {
+      "full": {
+        "name": "Full",
+        "aliases": [
+          "full",
+          "gp"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1 (Quercia)",
+            "start": 0.03,
+            "end": 0.08,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.12,
+            "end": 0.16,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.2,
+            "end": 0.25,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4 (Tramonto)",
+            "start": 0.3,
+            "end": 0.35,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5",
+            "start": 0.38,
+            "end": 0.42,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.45,
+            "end": 0.5,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.52,
+            "end": 0.56,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8 (Carro)",
+            "start": 0.6,
+            "end": 0.68,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9",
+            "start": 0.72,
+            "end": 0.76,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10",
+            "start": 0.78,
+            "end": 0.82,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11 (Del Rio)",
+            "start": 0.85,
+            "end": 0.9,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12 (Curvone)",
+            "start": 0.92,
+            "end": 0.96,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "T13 (Variante)",
+            "start": 0.96,
+            "end": 0.99,
+            "_confidence": "estimated"
+          }
+        ]
+      }
+    }
+  },
+  "valencia": {
+    "name": "Circuit Ricardo Tormo",
+    "aliases": [
+      "valencia",
+      "ricardo tormo",
+      "circuit-ricardo-tormo",
+      "cheste"
+    ],
+    "default_config": "gp",
+    "configs": {
+      "gp": {
+        "name": "GP",
+        "aliases": [
+          "gp",
+          "full"
+        ],
+        "corners": [
+          {
+            "id": 1,
+            "name": "T1",
+            "start": 0.02,
+            "end": 0.07,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 2,
+            "name": "T2",
+            "start": 0.1,
+            "end": 0.15,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 3,
+            "name": "T3",
+            "start": 0.2,
+            "end": 0.25,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 4,
+            "name": "T4",
+            "start": 0.3,
+            "end": 0.35,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 5,
+            "name": "T5",
+            "start": 0.38,
+            "end": 0.42,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 6,
+            "name": "T6",
+            "start": 0.48,
+            "end": 0.55,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 7,
+            "name": "T7",
+            "start": 0.58,
+            "end": 0.62,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 8,
+            "name": "T8",
+            "start": 0.65,
+            "end": 0.68,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 9,
+            "name": "T9",
+            "start": 0.72,
+            "end": 0.77,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 10,
+            "name": "T10",
+            "start": 0.82,
+            "end": 0.86,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 11,
+            "name": "T11",
+            "start": 0.88,
+            "end": 0.92,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 12,
+            "name": "T12",
+            "start": 0.94,
+            "end": 0.98,
+            "_confidence": "estimated"
+          },
+          {
+            "id": 13,
+            "name": "T13",
+            "start": 0.98,
+            "end": 0.99,
+            "_confidence": "estimated"
           }
         ]
       }

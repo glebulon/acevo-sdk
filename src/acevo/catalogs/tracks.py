@@ -2,6 +2,8 @@
 
 import json
 import os
+import re
+from importlib import resources
 from pathlib import Path
 
 # Path to track catalog JSON file
@@ -10,15 +12,20 @@ _CATALOG_PATH = Path(__file__).parent / "data" / "track_catalog.json"
 
 def _load_catalog() -> dict:
     """Load track catalog from JSON file with schema validation."""
-    if not _CATALOG_PATH.exists():
-        raise FileNotFoundError(f"Track catalog not found at {_CATALOG_PATH}")
-    
-    with open(_CATALOG_PATH, encoding="utf-8") as f:
-        catalog = json.load(f)
-    
+    try:
+        catalog_text = resources.files("acevo.catalogs").joinpath("data", "track_catalog.json").read_text(encoding="utf-8")
+    except (FileNotFoundError, ModuleNotFoundError, OSError, TypeError):
+        # Keep source checkouts and PyInstaller bundles working when the
+        # package resource loader is not available for the active importer.
+        if not _CATALOG_PATH.exists():
+            raise FileNotFoundError(f"Track catalog not found at {_CATALOG_PATH}")  # noqa: B904
+        catalog_text = _CATALOG_PATH.read_text(encoding="utf-8")
+
+    catalog = json.loads(catalog_text)
+
     # Schema validation
     _validate_catalog(catalog)
-    
+
     return catalog
 
 
@@ -26,34 +33,34 @@ def _validate_catalog(catalog: dict) -> None:
     """Validate catalog structure and required fields."""
     if not isinstance(catalog, dict):
         raise ValueError("Catalog must be a dictionary")
-    
+
     for track_key, track in catalog.items():
         if not isinstance(track, dict):
             raise ValueError(f"Track '{track_key}' must be a dictionary")
-        
+
         # Required track fields
         required_fields = ["name", "aliases", "default_config", "configs"]
         for field in required_fields:
             if field not in track:
                 raise ValueError(f"Track '{track_key}' missing required field: {field}")
-        
+
         # Validate configs
         if not isinstance(track["configs"], dict):
             raise ValueError(f"Track '{track_key}' configs must be a dictionary")
-        
+
         for config_key, config in track["configs"].items():
             if not isinstance(config, dict):
                 raise ValueError(f"Config '{config_key}' in track '{track_key}' must be a dictionary")
-            
+
             # Validate corners
             if "corners" in config:
                 if not isinstance(config["corners"], list):
                     raise ValueError(f"Corners in config '{config_key}' must be a list")
-                
+
                 for corner in config["corners"]:
                     if not isinstance(corner, dict):
                         raise ValueError(f"Corner must be a dictionary in config '{config_key}'")
-                    
+
                     required_corner_fields = ["id", "name", "start", "end"]
                     for field in required_corner_fields:
                         if field not in corner:
@@ -64,58 +71,178 @@ def _validate_catalog(catalog: dict) -> None:
 TRACK_CATALOG = _load_catalog()
 
 
+def _corner_confidence(corner: dict) -> str:
+    """Extract confidence from a corner dict, defaulting to 'profiled'."""
+    return corner.get("_confidence", "profiled")
+
+
 def build_track_profile(track_key: str, config_key: str) -> dict:
-    """Build a track profile dictionary."""
+    """Build a track profile dictionary.
+
+    Returns a dict with keys:
+        track_key, track_name, config_key, config_name, display_name,
+        corners (list), confidence (str) — the overall profile confidence
+        is "estimated" if ANY corner in the profile is estimated.
+    """
     track = TRACK_CATALOG[track_key]
     config = track["configs"][config_key]
+    corners = config.get("corners", [])
+    # Overall profile confidence: "estimated" if any corner is estimated
+    overall_confidence = "estimated" if any(_corner_confidence(c) == "estimated" for c in corners) else "profiled"
     return {
         "track_key": track_key,
         "track_name": track["name"],
         "config_key": config_key,
         "config_name": config["name"],
         "display_name": f"{track['name']} ({config['name']})",
-        "corners": config.get("corners", []),
+        "corners": corners,
+        "confidence": overall_confidence,
     }
 
 
 def select_track_profile(
-    path: str = None,
-    track_name: str = None,
-    config_name: str = None
+    path: str | None = None,
+    track_name: str | None = None,
+    config_name: str | None = None,
 ) -> tuple:
     """Select a track profile based on path, track name, or config name.
 
     Returns:
         tuple: (track_key, track_profile) or (None, None) if not found
     """
-    if track_name:
-        # Direct match first
-        if track_name in TRACK_CATALOG:
-            track = TRACK_CATALOG[track_name]
-            return track_name, build_track_profile(track_name, track["default_config"])
+    if config_name:
+        config_slug_value = track_slug(config_name)
+        if not config_slug_value:
+            return None, None
 
-        # Search aliases
+    if track_name:
+        # Collect every catalog entry whose normalized key, display name, or
+        # aliases match the name. A single track name can map to several
+        # entries (e.g. "Nurburgring" matches both the Nordschleife and GP
+        # catalogs), so do not stop at the first hit when a layout is given.
+        track_slug_value = track_slug(track_name)
+        matching_keys: list[str] = []
+        for track_key in TRACK_CATALOG:
+            if track_slug(track_key) == track_slug_value:
+                matching_keys.append(track_key)
+                break
         for track_key, track in TRACK_CATALOG.items():
-            labels = [track_key, *track.get("aliases", [])]
-            if track_name.lower() in [label.lower() for label in labels]:
-                if config_name:
-                    for config_key, config in track["configs"].items():
-                        config_labels = [config_key, *config.get("aliases", [])]
-                        if config_name.lower() in [label.lower() for label in config_labels]:
+            if track_key in matching_keys:
+                continue
+            labels = [track_key, track.get("name", ""), *track.get("aliases", [])]
+            if any(track_slug(label) == track_slug_value for label in labels):
+                matching_keys.append(track_key)
+
+        if config_name:
+            # Prefer a config whose normalized key/name/aliases match across
+            # all exact track-name matches.
+            for track_key in matching_keys:
+                track = TRACK_CATALOG[track_key]
+                for config_key, config in track["configs"].items():
+                    config_labels = [config_key, config.get("name", ""), *config.get("aliases", [])]
+                    if any(track_slug(label) == config_slug_value for label in config_labels):
+                        return track_key, build_track_profile(track_key, config_key)
+
+            # A parent track plus an explicit layout can identify a separate
+            # catalog entry, such as ``Suzuka`` + ``East``. Derive the parent
+            # from the entry labels and its matching config label.
+            for track_key, track in TRACK_CATALOG.items():
+                for config_key, config in track["configs"].items():
+                    config_labels = [config_key, config.get("name", ""), *config.get("aliases", [])]
+                    if not any(track_slug(label) == config_slug_value for label in config_labels):
+                        continue
+                    for label in [track_key, track.get("name", ""), *track.get("aliases", [])]:
+                        label_slug = track_slug(label)
+                        suffix = f"_{config_slug_value}"
+                        if label_slug.endswith(suffix) and label_slug[: -len(suffix)] == track_slug_value:
                             return track_key, build_track_profile(track_key, config_key)
-                return track_key, build_track_profile(track_key, track["default_config"])
+
+            # An explicit layout is a constraint. Unknown or conflicting
+            # layouts must not silently select a default profile.
+            return None, None
+
+        # Without an explicit layout, prefer a non-default config named by an
+        # exact layout-specific track label before using the entry default.
+        if matching_keys:
+            track_key = matching_keys[0]
+            track = TRACK_CATALOG[track_key]
+            for config_key, config in track["configs"].items():
+                if config_key == track["default_config"]:
+                    continue
+                config_labels = [config_key, config.get("name", ""), *config.get("aliases", [])]
+                if any(
+                    config_slug
+                    and track_slug_value.endswith(f"_{config_slug}")
+                    for label in config_labels
+                    for config_slug in [track_slug(label)]
+                ):
+                    return track_key, build_track_profile(track_key, config_key)
+            return track_key, build_track_profile(track_key, TRACK_CATALOG[track_key]["default_config"])
+
+        # Session labels often append a layout token to an otherwise exact
+        # track label (for example ``monza_gp``). Retry that final token as a
+        # config only when no exact track label matched and no explicit config
+        # was supplied.
+        if not config_name and "_" in track_slug_value:
+            parent_slug, config_slug = track_slug_value.rsplit("_", 1)
+            if parent_slug and config_slug:
+                return select_track_profile(track_name=parent_slug, config_name=config_slug)
+
         return None, None
 
     if path:
+        path_parts = [part for part in re.split(r"[\\/]", path) if part]
+        for component in reversed(path_parts):
+            if any(
+                track_slug(label) == track_slug(component)
+                for track_key, track in TRACK_CATALOG.items()
+                for label in [track_key, track.get("name", ""), *track.get("aliases", [])]
+            ):
+                # Reuse normalized name/config handling for an exact path
+                # component before considering the legacy loose substring match.
+                return select_track_profile(track_name=component, config_name=config_name)
+
         path_l = os.path.normpath(path).lower()
         for track_key, track in TRACK_CATALOG.items():
             if any(alias in path_l for alias in track.get("aliases", [])):
+                if config_name:
+                    config_slug_value = track_slug(config_name)
+                    for config_key, config in track["configs"].items():
+                        config_labels = [config_key, config.get("name", ""), *config.get("aliases", [])]
+                        if any(track_slug(label) == config_slug_value for label in config_labels):
+                            return track_key, build_track_profile(track_key, config_key)
+                    return None, None
                 for config_key, config in track["configs"].items():
                     if any(alias in path_l for alias in config.get("aliases", [])):
                         return track_key, build_track_profile(track_key, config_key)
                 return track_key, build_track_profile(track_key, track["default_config"])
 
     return None, None
+
+
+def track_slug(name: str | None) -> str:
+    """Deterministic slug: lowercase, any non-alphanumeric run -> '_'."""
+    return re.sub(r"[^a-z0-9]+", "_", (name or "").lower()).strip("_")
+
+
+def resolve_track_key(track_name: str | None) -> str | None:
+    """Resolve a raw track name to a canonical catalog key.
+
+    Exact matching only after slug normalization (spaces, underscores and
+    hyphens all collapse to '_'), so 'Spa-Francorchamps', 'spa francorchamps'
+    and 'circuit_de_spa_francorchamps' all resolve to the same key.
+    Unlike ``find_track_by_name`` there is no prefix fuzzy matching, so an
+    unknown track can never collapse onto a catalog entry.
+    """
+    slug = track_slug(track_name)
+    if not slug:
+        return None
+    if slug in TRACK_CATALOG:
+        return slug
+    for track_key, track in TRACK_CATALOG.items():
+        if slug in {track_slug(alias) for alias in track.get("aliases", [])}:
+            return track_key
+    return None
 
 
 def find_track_by_name(track_name: str) -> tuple:
