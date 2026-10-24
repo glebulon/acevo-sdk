@@ -148,6 +148,38 @@ Catalog helpers live under `acevo.catalogs` (`resolve_track_key`,
 
 Please report issues at https://github.com/glebulon/acevo-sdk/issues.
 
+## Fixing a Bug Found in a Downstream App
+
+When a bug in SDK code shows up in an app that depends on it (e.g. SimLaps):
+
+1. Point the app's virtualenv at this checkout so breakpoints and edits hit
+   SDK source directly:
+
+   ```bash
+   # run the app's pip, targeting this repo
+   /path/to/app/venv/Scripts/pip.exe install -e "C:\Storage\my_documents\acevo-sdk[dev]"
+   ```
+
+   `acevo.__file__` should now resolve inside this repo. Reproduce the bug
+   in the app, debug, and fix here.
+
+2. Add a regression test in `tests/`, then verify:
+
+   ```bash
+   ruff check .
+   pytest
+   ```
+
+3. Release a new version using the checklist below, then in the downstream
+   app: restore the pinned install (`pip install acevo-sdk==X.Y.Z`), bump the
+   pin in its `requirements.txt`, run its test suite, and rebuild.
+
+Do **not** cut a release build of a downstream app while the editable
+install is active — whatever is in this working tree gets bundled. For a
+hotfix that cannot wait for a PyPI release, build the wheel locally
+(`python -m build`) and install it into the app's venv, or pin the app to a
+git tag instead of PyPI.
+
 ## Publishing
 
 This repo is designed for PyPI Trusted Publishing through GitHub Actions.
