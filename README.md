@@ -191,11 +191,11 @@ python -m pip install -e ".[dev]"
 ruff check .
 pytest
 python -m build
-git tag v0.2.0
-git push origin v0.2.0
+git tag v0.2.1
+git push origin v0.2.1
 ```
 
-Create the GitHub Release for `v0.2.0`; the publish workflow uploads the package to PyPI.
+Create the GitHub Release for `v0.2.1`; the publish workflow uploads the package to PyPI.
 
 ## License
 

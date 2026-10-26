@@ -924,20 +924,25 @@ class LogParser:
         Offline single-player sessions (e.g. Special Event / hotlap / practice)
         may emit neither ``Game Started!`` nor a network ``connect`` line, so no
         session is ever created and player laps are dropped. Once the player car
-        is bound, the first in-session driving signal (a player-only practice
-        split, a physics lap, or a player ``New lap``) creates a fallback
-        PRACTICE session so subsequent sectors and laps are captured.
+        is bound, the first in-session driving signal (a ``Received split``
+        event or a player ``New lap``) creates a fallback PRACTICE session so
+        subsequent sectors and laps are captured.
+
+        Only player-scoped signals may trigger this. ``On Split`` lines and
+        ``Lap test evOnLapCompleted`` fire for every car on track, so AI cars
+        completing their race after the player's session ended would spawn
+        phantom sessions. ``Received split`` is emitted only for the local
+        player's own splits; player ``New lap`` lines carry the car UUID.
         """
         if self._seen_explicit_session_marker or not self.context.car_uuid:
             return
-        is_practice_split = "On Split start" in line and self._pats["practice_split"].search(line)
-        is_physics_lap = "Lap test evOnLapCompleted" in line
+        is_received_split = "Received split:" in line
         is_player_lap = (
             "New lap carId" in line
             and (m := self._pats["lap_finish"].search(line)) is not None
             and self._is_player_car(m.group(2))
         )
-        if is_practice_split or is_physics_lap or is_player_lap:
+        if is_received_split or is_player_lap:
             self._start_new_session("PRACTICE", line)
             self._session_active_from_logs = True
             log_debug(
@@ -1122,6 +1127,7 @@ class LogParser:
                 "Resetting shared session anyway.",
             )
             self._reset_session_boundary("unrecognised Game Started", finalize_current_session=True)
+            self._seen_explicit_session_marker = True
             self.context.reset_for_new_session()
             return False
         m = self._pats["game_started"].search(line)
@@ -1136,10 +1142,12 @@ class LogParser:
             # session is starting.  Clear the shared session to prevent stale
             # lap timing/validity data from the previous session leaking in.
             self._reset_session_boundary("unrecognised Game Started", finalize_current_session=True)
+            self._seen_explicit_session_marker = True
             self.context.reset_for_new_session()
             return False
 
         self._reset_session_boundary("Game Started", finalize_current_session=True)
+        self._seen_explicit_session_marker = True
         self._session_active_from_logs = True
 
         raw_type, raw_track_desc, raw_car, raw_weather = (
@@ -2216,6 +2224,10 @@ class LogParser:
             self.sessions.append(self.current_session)
         self.current_session = None
         self._session_active_from_logs = False
+        # Re-arm the fallback session creator: the session that used explicit
+        # markers has ended, and the next one (e.g. an online session, which
+        # emits neither 'Game Started!' nor a network connect line) may not.
+        self._seen_explicit_session_marker = False
         self._reset_in_progress()
 
     # ── Master line processor ─────────────────────────────────────────────────

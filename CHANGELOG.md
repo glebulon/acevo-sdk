@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1
+
+- Log parser: fixed multiplayer sessions producing no laps. After any session
+  that used explicit markers (`Game Started!`/`connect`), the offline fallback
+  stayed disabled for the rest of the log, so online sessions — which emit
+  neither — never created a session. `_seen_explicit_session_marker` now
+  clears when a session is finalised.
+- Log parser: the fallback session creator now triggers only on player-scoped
+  driving signals (`Received split`, player `New lap`). `On Split` and
+  `evOnLapCompleted` fire for every car on track and spawned phantom sessions
+  from AI cars during post-race cooldown.
+
 ## 0.2.0
 
 - Synced with sim-laps-client @ HEAD (post-split development through Oct 2026).
