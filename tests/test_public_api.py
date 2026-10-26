@@ -16,7 +16,7 @@ from acevo import (
 
 
 def test_public_api_imports() -> None:
-    assert __version__ == "0.2.0"
+    assert __version__ == "0.2.1"
     assert LogParser is not None
     assert TelemetryCapture is not None
     assert RegionReader is not None
