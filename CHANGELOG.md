@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2
+
+- Log parser: fixed race-weekend sub-sessions reporting `UNKNOWN` session
+  type. A `GameModeType_RACE_WEEKEND` weekend emits `Game Started!` only
+  once; each subsequent sub-session announces itself via
+  `<ModeClass> <Name> created` lines (e.g. `TimeAttackRemote Qualifying
+  created`, `InstantRaceRemote Race created`). Those are now treated as
+  session boundaries, so qualifying/warmup/race laps get their real type
+  instead of the `connect`-line fallback's `UNKNOWN`.
+
 ## 0.2.1
 
 - Log parser: fixed multiplayer sessions producing no laps. After any session

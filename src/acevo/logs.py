@@ -248,6 +248,14 @@ class LogParser:
                 r"\[gameplay\] \[info\] Game Started!\s*GameModeType_([A-Z_]+)"
                 r" \| (.+?) \| ([\w_]+) \| GameModeSelectionWeatherType_(\w+)"
             ),
+            # Race-weekend sub-session boundary. Only the weekend's first
+            # sub-session emits 'Game Started!'; every subsequent one is
+            # announced as '<ModeClass> <Name> created', e.g.
+            # 'InstantRaceRemote Race created'.
+            "gamemode_created": re.compile(
+                r"\[gameplay\] \[info\] \w+ "
+                r"(Practice|Qualifying|Warmup|Race|Hotlap|Drift|Time Attack) created"
+            ),
             "date": re.compile(r"^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})"),
             "set_compound_old": re.compile(r"setCompound Tyre:\s*(\d+)\s+compound(?: name)?:\s*(\w+)"),
             "loading_tyre_compound": re.compile(r"LOADING TYRE COMPOUND (.+)"),
@@ -2285,6 +2293,15 @@ class LogParser:
     def _process_session_lifecycle(self, line: str) -> bool:
         """Handle session start/end detection. Returns True if a new session started."""
         if self._handle_session_start(line):
+            return True
+        if " created" in line and (m := self._pats["gamemode_created"].search(line)):
+            # Weekend sub-sessions emit no fresh 'Game Started!' marker; the
+            # '<ModeClass> <Name> created' line is the session boundary. The
+            # flags come after _start_new_session because finalising the old
+            # session re-arms the fallback creator.
+            self._start_new_session(m.group(1).upper().replace(" ", "_"), line)
+            self._seen_explicit_session_marker = True
+            self._session_active_from_logs = True
             return True
         if "request made GameModeRequestRestartSession" in line:
             # Live tail pre-handles this via _emit_session_restart, which leaves
