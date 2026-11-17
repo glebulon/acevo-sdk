@@ -68,7 +68,11 @@ def _is_terminal_graphics_state(
 
 
 def _is_replay_graphics_state(graphics_data: dict[str, Any]) -> bool:
-    """Return whether a graphics snapshot is replay data, not live timing."""
+    """Return whether a graphics snapshot is replay or spectated-car data, not the player's live timing."""
+    focused = graphics_data.get("focused_car_id")
+    player = graphics_data.get("player_car_id")
+    if focused is not None and player is not None and focused != player:
+        return True
     return _graphics_status_name(graphics_data) in _REPLAY_STATUS_NAMES
 
 

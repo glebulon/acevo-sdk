@@ -553,6 +553,24 @@ def test_graphics_replay_state_cannot_publish_stale_completion() -> None:
 
     assert manager.get_lap_completions_after(0.0) == []
 
+
+def test_graphics_spectated_car_lap_is_not_published_as_player_completion() -> None:
+    manager = SharedSessionManager()
+    base = {"status_name": "AC_LIVE", "session_phase": "Session", "is_valid_lap": True, "player_car_id": 1}
+    for current in (1_000, 2_000, 3_000):
+        manager.update_from_graphics_shm(
+            {**base, "focused_car_id": 1, "total_lap_count": 0, "current_lap_time_ms": current, "last_laptime_ms": 0}
+        )
+    manager.update_from_graphics_shm(
+        {**base, "focused_car_id": 2, "total_lap_count": 3, "current_lap_time_ms": 376_000, "last_laptime_ms": 0}
+    )
+    manager.update_from_graphics_shm(
+        {**base, "focused_car_id": 2, "total_lap_count": 4, "current_lap_time_ms": 50, "last_laptime_ms": 377_478}
+    )
+
+    assert manager.get_lap_completions_after(0.0) == []
+
+
 def test_graphics_disqualified_and_teardown_states_suppress_completion() -> None:
     for phase in ("Disqualified", "Teardown"):
         manager = SharedSessionManager()
