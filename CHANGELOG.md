@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- Shared session: graphics snapshots where the focused car differs from the
+  player's car (spectating another driver) are treated like replay data, so a
+  spectated car's lap is no longer published as the player's lap completion.
+
 ## 0.2.2
 
 - Log parser: fixed race-weekend sub-sessions reporting `UNKNOWN` session
